@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "165291680266",
+    "project_id": "native-acfca",
+    "storage_bucket": "native-acfca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165291680266:android:d0a5bd5cecd21588c9b5f3",
+        "android_client_info": {
+          "package_name": "com.company.nativeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAya5qwTO63QH5y5ml7jFVFlAetFLWCS4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
