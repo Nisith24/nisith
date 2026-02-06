@@ -5,13 +5,12 @@ import '../../../core/models/models.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../bookmarks/providers/bookmark_provider.dart';
-import '../../mcq/providers/question_pack_provider.dart';
+import '../providers/deck_provider.dart';
 import 'widgets/swipeable_card.dart';
 import 'widgets/mcq_card.dart';
 import '../../../core/utils/constants.dart';
 
 /// DeckScreen - Main swipeable MCQ card screen
-/// Matches React Native (tabs)/index.tsx
 class DeckScreen extends ConsumerStatefulWidget {
   const DeckScreen({super.key});
 
@@ -20,65 +19,24 @@ class DeckScreen extends ConsumerStatefulWidget {
 }
 
 class _DeckScreenState extends ConsumerState<DeckScreen> {
-  int _activeIndex = 0;
-  List<MCQ> _cards = [];
-  bool _isLoading = true;
+  // Local debouncer
+  bool _isSwiping = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCards();
-  }
+  void _handleSwipeComplete(bool isUp, DeckState deckState) async {
+    if (_isSwiping) return;
+    _isSwiping = true;
 
-  Future<void> _loadCards() async {
-    try {
-      debugPrint('_loadCards: Starting...');
-      // Ensure packs are loaded from Firebase
-      final packs = await ref.read(questionPacksProvider.future);
-      debugPrint('_loadCards: Loaded ${packs.length} packs');
-
-      if (!mounted) return;
-
-      // Get weighted MCQs
-      final questions = ref.read(weightedMCQsProvider(10));
-      debugPrint('_loadCards: Loaded ${questions.length} questions');
-
-      setState(() {
-        _cards = questions;
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('Error loading cards: $e');
-      if (mounted) {
-        setState(() {
-          _cards = [];
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  void _handleSwipeComplete(bool isUp) {
-    final currentCard = _cards[_activeIndex];
+    final currentCard = deckState.cards[deckState.activeIndex];
 
     // Mark as viewed
     ref.read(authStateProvider.notifier).markMcqViewed(currentCard.id);
 
-    setState(() {
-      _activeIndex++;
+    // Notify provider to advance
+    ref.read(deckProvider.notifier).nextCard();
 
-      // Load more cards if running low
-      if (_activeIndex >= _cards.length - 3) {
-        _loadMoreCards();
-      }
-    });
-  }
-
-  Future<void> _loadMoreCards() async {
-    final moreQuestions = ref.read(weightedMCQsProvider(5));
-    setState(() {
-      _cards.addAll(moreQuestions);
-    });
+    // Unlock swipe after a brief buffer
+    await Future.delayed(const Duration(milliseconds: 200));
+    _isSwiping = false;
   }
 
   void _handleToggleBookmark(MCQ mcq) {
@@ -94,6 +52,11 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final deckState = ref.watch(deckProvider);
+    final cards = deckState.cards;
+    final activeIndex = deckState.activeIndex;
+    final isLoading = deckState.isLoading;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -104,42 +67,22 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
               child: Row(
                 children: [
                   Text(
-                    'Practice',
+                    'Deck',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                  const Spacer(),
-                  if (_cards.isNotEmpty) _buildProgressIndicator(),
                 ],
               ),
             ),
 
             // Card stack
             Expanded(
-              child: _isLoading
+              child: isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : _cards.isEmpty
+                  : cards.isEmpty
                       ? _buildEmptyState()
-                      : _buildCardStack(),
+                      : _buildCardStack(cards, activeIndex, deckState),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: context.primaryColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        '${_activeIndex + 1} / ${_cards.length}',
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: context.primaryColor,
         ),
       ),
     );
@@ -168,8 +111,8 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
-              setState(() => _isLoading = true);
-              _loadCards();
+              // This would likely need a method in provider to force reload or reset
+              // For now, we assume provider handles this if empty
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Refresh'),
@@ -182,38 +125,53 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
     );
   }
 
-  Widget _buildCardStack() {
-    // Show 3 cards in stack
-    final visibleCards = _cards.skip(_activeIndex).take(3).toList();
+  Widget _buildCardStack(
+      List<MCQ> cards, int activeIndex, DeckState deckState) {
+    // Render up to 10 cards ahead for smoothness
+    final visibleCount = 10;
+
+    // We only take what is available
+    final available = cards.skip(activeIndex).take(visibleCount).toList();
 
     return Padding(
       padding: const EdgeInsets.only(left: 24, right: 24, bottom: 40),
       child: Stack(
-        children: visibleCards
+        children: available
             .asMap()
             .entries
             .map((entry) {
-              final index = entry.key;
+              final index = entry.key; // 0 to 9 ideally
               final mcq = entry.value;
               final isBookmarked = ref.watch(isBookmarkedProvider(mcq.id));
+
+              // We only render the first 4 fully interactive or visible
+              // The rest can be simplified or hidden to save resources, but
+              // keeping them in the tree prevents "pop-in" of state.
+              // SwipeableCard will handle the visual stacking logic using 'index'
 
               return SwipeableCard(
                 key: ValueKey(mcq.id),
                 index: index,
-                activeIndex: 0,
-                onSwipeUp: () => _handleSwipeComplete(true),
-                onSwipeDown: () => _handleSwipeComplete(false),
+                activeIndex: 0, // In this sub-list, the top card is always 0
+                onSwipeUp: () => _handleSwipeComplete(true, deckState),
+                onSwipeDown: () => _handleSwipeComplete(false, deckState),
+                // Only enable touch for the top card
+                enabled: index == 0,
                 child: MCQCard(
                   mcq: mcq,
                   mode: MCQCardMode.learn,
                   isBookmarked: isBookmarked,
                   onToggleBookmark: () => _handleToggleBookmark(mcq),
-                  onNext: () => _handleSwipeComplete(true),
+                  onNext: () => _handleSwipeComplete(true, deckState),
                 ),
               );
             })
             .toList()
-            .reversed
+            .reversed // Stack: last in list is top visually if using Z-order?
+            // NO. In Stack, last child is ON TOP.
+            // So we must reverse: index 0 (Top card) should be LAST child.
+            // List is [0, 1, 2...]. Reversed is [..., 2, 1, 0].
+            // 0 is last -> 0 is Top. Correct.
             .toList(),
       ),
     );

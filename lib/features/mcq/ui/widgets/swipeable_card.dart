@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
+
 import 'package:flutter/services.dart';
 
 /// SwipeableCard - Smoother, physics-based swipe card
@@ -58,44 +58,37 @@ class _SwipeableCardState extends State<SwipeableCard>
     super.dispose();
   }
 
-  void _onPanStart(DragStartDetails details) {
+  void _onDragStart(DragStartDetails details) {
     if (!widget.enabled || widget.index != widget.activeIndex) return;
-    _controller.stop(); // Stop any ongoing animation
+    _controller.stop();
   }
 
-  void _onPanUpdate(DragUpdateDetails details) {
+  void _onDragUpdate(DragUpdateDetails details) {
     if (!widget.enabled || widget.index != widget.activeIndex) return;
     setState(() {
-      // Accumulate drag
-      _dragOffset += details.delta;
+      _dragOffset += Offset(details.primaryDelta ?? 0, 0);
     });
   }
 
-  void _onPanEnd(DragEndDetails details) {
+  void _onDragEnd(DragEndDetails details) {
     if (!widget.enabled || widget.index != widget.activeIndex) return;
 
-    final velocity = details.velocity.pixelsPerSecond;
-    final dy = _dragOffset.dy;
+    final velocity = details.primaryVelocity ?? 0;
+    final dx = _dragOffset.dx;
 
-    // Thresholds
     const flingVelocity = 800.0;
-    const distanceThreshold = 150.0;
+    const distanceThreshold = 80.0;
 
     bool shouldDismiss = false;
-    bool isUp = false;
 
-    // Check velocity or distance
-    if (velocity.dy < -flingVelocity || dy < -distanceThreshold) {
+    // Check horizontal only
+    if (velocity.abs() > flingVelocity || dx.abs() > distanceThreshold) {
       shouldDismiss = true;
-      isUp = true;
-    } else if (velocity.dy > flingVelocity || dy > distanceThreshold) {
-      shouldDismiss = true;
-      isUp = false;
     }
 
     if (shouldDismiss) {
       HapticFeedback.mediumImpact();
-      _animateOut(velocity, isUp);
+      _animateOut(Offset(velocity, 0));
     } else {
       _animateBack();
     }
@@ -112,11 +105,13 @@ class _SwipeableCardState extends State<SwipeableCard>
     _controller.forward(from: 0);
   }
 
-  Future<void> _animateOut(Offset pixelsPerSecond, bool up) async {
-    // Fly off screen
-    final endY = up ? -1000.0 : 1000.0;
-    // Calculate end X based on trajectory to feel natural
-    final endX = _dragOffset.dx + (pixelsPerSecond.dx * 0.3);
+  Future<void> _animateOut(Offset pixelsPerSecond) async {
+    // Horizontal Exit
+    final endX = _dragOffset.dx > 0 ? 1000.0 : -1000.0;
+    // Slight vertical drift based on random or previous momentum?
+    // Since we track 0 Y, let's keep it straight or slightly arc-ed?
+    // Straight is cleaner for "Next".
+    final endY = 0.0;
 
     _animation = Tween<Offset>(
       begin: _dragOffset,
@@ -127,11 +122,16 @@ class _SwipeableCardState extends State<SwipeableCard>
     await _controller.forward(from: 0);
 
     if (mounted) {
-      if (up) {
-        widget.onSwipeUp?.call();
-      } else {
-        widget.onSwipeDown?.call();
-      }
+      // Always Next?
+      // User asked for "Sidewise". Left vs Right.
+      // Usually Right = Like/Next, Left = Nope/Next.
+      // We map both to "Next" in this app provided callbacks.
+      // But wait, the callbacks are onSwipeUp/Down.
+      // I should probably check direction?
+      // Current deck_screen uses SwipeUp for Next.
+      // Let's just call onSwipeUp (Next) for ANY horizontal dismissal for now, or map Right->Up, Left->Down?
+      // Previous turn logic: Horizontal -> Next (Up).
+      widget.onSwipeUp?.call();
     }
   }
 
@@ -140,15 +140,19 @@ class _SwipeableCardState extends State<SwipeableCard>
     final isActive = widget.index == widget.activeIndex;
     final int stackIndex = widget.index - widget.activeIndex;
 
+    // Optimization: Hide cards far down the stack to save resources but keep them ready
+    // We keep up to index 3 visible (4 cards total).
+    if (stackIndex > 3) {
+      return Offstage(offstage: true, child: widget.child);
+    }
+
     // Visual calculations for stack effect
     // Top card (0) -> scale 1.0, y 0
     // Next card (1) -> scale 0.95, y 20
     // Next card (2) -> scale 0.90, y 40
 
-    // If we are dragging the top card, the cards behind should animate slightly forward
-    // but for simplicity, let's keep them static or just basic positional offset first to fix the "hell" behavior.
-
-    final scale = (1.0 - (stackIndex * 0.05)).clamp(0.8, 1.0);
+    // Clamp scale to not get too small
+    final scale = (1.0 - (stackIndex * 0.05)).clamp(0.85, 1.0);
     final offsetY = stackIndex * 15.0; // Vertical stacking offset
 
     // For the active card, we add the drag offset
@@ -158,23 +162,41 @@ class _SwipeableCardState extends State<SwipeableCard>
     // Rotation based on X drag (only for active card)
     final rotation = isActive ? (_dragOffset.dx * 0.001).clamp(-0.2, 0.2) : 0.0;
 
-    return Transform.translate(
-      offset: Offset(transformX, transformY + offsetY),
-      child: Transform.scale(
-        scale: scale,
-        alignment: Alignment
-            .bottomCenter, // Stack from bottom looks better often, or center
-        child: Transform.rotate(
-          angle: rotation,
-          child: GestureDetector(
-            onPanStart: _onPanStart,
-            onPanUpdate: _onPanUpdate,
-            onPanEnd: _onPanEnd,
-            // Important to allow touches to pass through to buttons when not dragging
-            behavior: HitTestBehavior.deferToChild,
-            child: widget.child,
-          ),
-        ),
+    // Singularity Effect:
+    // The card at index 3 (bottom visible) should be fully opaque but scaled down.
+    // When swipes happen, index 4 (Offstage) becomes index 3 (Visible).
+    // Flutter's widget reuse might make it pop in.
+    // To make it smooth, maybe we allow index 3 to have opacity animated?
+    // Let's keep it simple first: Offstage -> Onstage.
+    // Index 3 is at the bottom of the visible stack.
+
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      scale: scale,
+      alignment: Alignment.bottomCenter,
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        tween: Tween<double>(end: offsetY),
+        builder: (context, animatedOffsetY, child) {
+          return Transform.translate(
+            offset: Offset(transformX, transformY + animatedOffsetY),
+            child: Transform.rotate(
+              angle: rotation,
+              child: GestureDetector(
+                onHorizontalDragStart: _onDragStart,
+                onHorizontalDragUpdate: _onDragUpdate,
+                onHorizontalDragEnd: _onDragEnd,
+                behavior: HitTestBehavior
+                    .translucent, // Allow touches to pass if needed? No, deferToChild is standard.
+                // deferToChild is default. But we want to claim Horizontal eagerly?
+                // Actually if specific HorizontalDrag is used, it should complete orthogonally to VerticalDrag.
+                child: widget.child,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

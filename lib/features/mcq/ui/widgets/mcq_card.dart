@@ -197,31 +197,45 @@ class _MCQCardState extends ConsumerState<MCQCard>
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: context.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              widget.mcq.subject ?? 'General',
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: context.primaryColor),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: context.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    widget.mcq.subject ?? 'General',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: context.primaryColor),
+                  ),
+                ),
+                if (widget.mcq.topic != null) ...[
+                  const SizedBox(height: 6),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(
+                      widget.mcq.topic!,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: context.textSecondaryColor,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.2, // More geometric feel
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          const SizedBox(width: 8),
-          if (widget.mcq.topic != null)
-            Expanded(
-              child: Text(
-                widget.mcq.topic!,
-                style:
-                    TextStyle(fontSize: 12, color: context.textSecondaryColor),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          const Spacer(),
           IconButton(
             onPressed: widget.onToggleBookmark,
             icon: Icon(
