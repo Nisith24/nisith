@@ -44,19 +44,65 @@ final allQuestionsProvider = Provider<List<MCQ>>((ref) {
   );
 });
 
-/// Weighted MCQ selection - matches React Native getSubjectWeightedMCQs
+class DeckFetchParams {
+  final int count;
+  final String? subject;
+
+  DeckFetchParams(this.count, [this.subject]);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DeckFetchParams &&
+          runtimeType == other.runtimeType &&
+          count == other.count &&
+          subject == other.subject;
+
+  @override
+  int get hashCode => count.hashCode ^ subject.hashCode;
+}
+
+/// Weighted MCQ selection - matching React Native logic + Subject Filtering
 final weightedMCQsProvider =
-    Provider.family<List<MCQ>, int>((ref, questionCount) {
+    Provider.family<List<MCQ>, DeckFetchParams>((ref, params) {
   final allQuestions = ref.watch(allQuestionsProvider);
   final userProfile = ref.watch(userProfileProvider);
 
   if (allQuestions.isEmpty) return [];
 
   final viewedIds = userProfile?.viewedMcqIds.toSet() ?? {};
+
+  // 1. Filter by View Status
   final unviewed =
       allQuestions.where((q) => !viewedIds.contains(q.id)).toList();
-  final pool = unviewed.length >= questionCount ? unviewed : allQuestions;
+  var pool = unviewed.length >= params.count ? unviewed : allQuestions;
 
+  // 2. Filter by Subject if requested
+  if (params.subject != null) {
+    pool = pool.where((q) => q.subject == params.subject).toList();
+    // If pool is empty after subject filter returning viewed questions?
+    // Logic: If strict subject filter, we might run out of unviewed questions fast.
+    // Fallback to all questions of that subject if unviewed ran out is handled above
+    // IF the initial pool was unviewed.
+    // BUT we need to re-check if the 'unviewed' logic reduced the pool too much for this specific subject.
+
+    // Better approach: Apply subject filter to ALL questions first, then check viewed/unviewed.
+    final subjectQuestions =
+        allQuestions.where((q) => q.subject == params.subject).toList();
+    final subjectUnviewed =
+        subjectQuestions.where((q) => !viewedIds.contains(q.id)).toList();
+
+    pool = subjectUnviewed.length >= params.count
+        ? subjectUnviewed
+        : subjectQuestions;
+
+    // Just shuffle and return take(count) since no weighting needed for single subject
+    final random = Random();
+    final selected = List<MCQ>.from(pool)..shuffle(random);
+    return selected.take(params.count).toList();
+  }
+
+  // 3. General Weighted Logic (No Subject Filter)
   // Group by subject
   final bySubject = <String, List<MCQ>>{};
   for (final q in pool) {
@@ -71,7 +117,7 @@ final weightedMCQsProvider =
   final selected = <MCQ>[];
   final random = Random();
 
-  for (var i = 0; i < questionCount && selected.length < pool.length; i++) {
+  for (var i = 0; i < params.count && selected.length < pool.length; i++) {
     var r = random.nextDouble() * totalWeight;
     String? chosenSubject;
 

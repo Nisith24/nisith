@@ -10,6 +10,7 @@ import '../../features/settings/ui/profile_screen.dart';
 import '../../features/stats/ui/analytics_screen.dart';
 import '../../features/shared/widgets/scaffold_with_nav.dart';
 import '../../features/bookmarks/ui/bookmarks_screen.dart';
+import '../../features/bookmarks/ui/bookmark_deck_screen.dart';
 
 /// App router provider - matches React Native Expo Router structure
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -46,6 +47,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/bookmarks',
         builder: (context, state) => const BookmarksScreen(),
+      ),
+
+      // Bookmarks Deck route
+      GoRoute(
+        path: '/bookmarks/deck',
+        builder: (context, state) {
+          final subject = state.uri.queryParameters['subject'];
+          return BookmarkDeckScreen(subjectFilter: subject);
+        },
       ),
 
       // Main shell with floating nav

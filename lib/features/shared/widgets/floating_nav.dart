@@ -86,151 +86,143 @@ class _FloatingNavState extends State<FloatingNav>
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 12,
-      right: 12,
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeOutBack,
-        tween: Tween(begin: 80.0, end: 0.0),
-        builder: (context, slide, child) {
-          return Transform.translate(
-            offset: Offset(slide, 0),
-            child: child,
-          );
-        },
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            // ... (rest of the build logic)
-            return Container(
-              height: 50,
-              width: _widthAnimation.value,
-              decoration: BoxDecoration(
-                color: context.isDark
-                    ? AppColors.dark.cardSurface
-                    : AppColors.light.cardSurface,
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(
-                  color: context.isDark
-                      ? AppColors.dark.border.withValues(alpha: 0.5)
-                      : AppColors.light.border.withValues(alpha: 0.5),
-                ),
-                boxShadow: [
+      top: MediaQuery.of(context).padding.top + 16,
+      right: 20,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Container(
+            height: 50,
+            width: _widthAnimation.value,
+            decoration: BoxDecoration(
+              color: _isExpanded
+                  ? (context.isDark
+                      ? AppColors.dark.cardSurface
+                      : AppColors.light.cardSurface)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(25),
+              border: _isExpanded
+                  ? Border.all(
+                      color: context.isDark
+                          ? AppColors.dark.border.withValues(alpha: 0.5)
+                          : AppColors.light.border.withValues(alpha: 0.5),
+                    )
+                  : null,
+              boxShadow: [
+                if (_isExpanded)
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                     spreadRadius: -2,
                   ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  // Menu items
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: Opacity(
-                        opacity: _controller.value > 0.4
-                            ? ((_controller.value - 0.4) / 0.6).clamp(0.0, 1.0)
-                            : 0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(_navItems.length, (index) {
-                            final item = _navItems[index];
-                            final isSelected = index == widget.currentIndex;
+              ],
+            ),
+            child: Stack(
+              children: [
+                // Menu items
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Opacity(
+                      opacity: _controller.value > 0.4
+                          ? ((_controller.value - 0.4) / 0.6).clamp(0.0, 1.0)
+                          : 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(_navItems.length, (index) {
+                          final item = _navItems[index];
+                          final isSelected = index == widget.currentIndex;
 
-                            // Staggered calculation based on animation controller
-                            // Each item has a window in the 0.0 - 1.0 range
-                            final start = 0.3 + (index * 0.1);
-                            final itemValue =
-                                ((_controller.value - start) / 0.4)
-                                    .clamp(0.0, 1.0);
+                          // Staggered calculation based on animation controller
+                          // Each item has a window in the 0.0 - 1.0 range
+                          final start = 0.3 + (index * 0.1);
+                          final itemValue = ((_controller.value - start) / 0.4)
+                              .clamp(0.0, 1.0);
 
-                            return Transform.translate(
-                              offset: Offset(15 * (1 - itemValue), 0),
-                              child: Transform.scale(
-                                scale: 0.85 + 0.15 * itemValue,
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  onPressed: () {
-                                    if (_isExpanded) _handleItemTap(index);
-                                  },
-                                  icon: Icon(
-                                    item.icon,
-                                    color: isSelected
-                                        ? (context.isDark
-                                            ? AppColors.dark.primary
-                                            : AppColors.light.primary)
-                                        : (context.isDark
-                                            ? AppColors.dark.icon
-                                            : AppColors.light.icon),
-                                    size: 18,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Toggle button
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: GestureDetector(
-                      onTapDown: (_) => setState(() => _isPressed = true),
-                      onTapUp: (_) => setState(() => _isPressed = false),
-                      onTapCancel: () => setState(() => _isPressed = false),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _toggle();
-                      },
-                      child: AnimatedScale(
-                        duration: const Duration(milliseconds: 100),
-                        scale: _isPressed ? 0.92 : 1.0,
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: context.isDark
-                                ? AppColors.dark.primary
-                                : AppColors.light.primary,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              if (!_isExpanded)
-                                BoxShadow(
-                                  color: (context.isDark
+                          return Transform.translate(
+                            offset: Offset(15 * (1 - itemValue), 0),
+                            child: Transform.scale(
+                              scale: 0.85 + 0.15 * itemValue,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  if (_isExpanded) _handleItemTap(index);
+                                },
+                                icon: Icon(
+                                  item.icon,
+                                  color: isSelected
+                                      ? (context.isDark
                                           ? AppColors.dark.primary
                                           : AppColors.light.primary)
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
+                                      : (context.isDark
+                                          ? AppColors.dark.icon
+                                          : AppColors.light.icon),
+                                  size: 18,
                                 ),
-                            ],
-                          ),
-                          child: Transform.rotate(
-                            angle: _rotationAnimation.value,
-                            child: Icon(
-                              _isExpanded ? LucideIcons.x : LucideIcons.menu,
-                              color: Colors.white,
-                              size: 20,
+                              ),
                             ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Toggle button
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: GestureDetector(
+                    onTapDown: (_) => setState(() => _isPressed = true),
+                    onTapUp: (_) => setState(() => _isPressed = false),
+                    onTapCancel: () => setState(() => _isPressed = false),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _toggle();
+                    },
+                    child: AnimatedScale(
+                      duration: const Duration(milliseconds: 100),
+                      scale: _isPressed ? 0.92 : 1.0,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: context.isDark
+                              ? AppColors.dark.primary
+                              : AppColors.light.primary,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            if (!_isExpanded)
+                              BoxShadow(
+                                color: (context.isDark
+                                        ? AppColors.dark.primary
+                                        : AppColors.light.primary)
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                          ],
+                        ),
+                        child: Transform.rotate(
+                          angle: _rotationAnimation.value,
+                          child: Icon(
+                            _isExpanded ? LucideIcons.x : LucideIcons.menu,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

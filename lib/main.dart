@@ -7,8 +7,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
-
 import 'core/storage/hive_service.dart';
+import 'core/storage/local_storage_service.dart';
+import 'core/services/background_sync_service.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -23,6 +24,9 @@ Future<void> main() async {
   await Hive.initFlutter();
   await HiveService.init();
 
+  // Initialize Local Storage Service (subject-specific boxes)
+  await LocalStorageService.instance.init();
+
   // Set system UI style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -34,11 +38,32 @@ Future<void> main() async {
   runApp(const ProviderScope(child: NeetFlowApp()));
 }
 
-class NeetFlowApp extends ConsumerWidget {
+class NeetFlowApp extends ConsumerStatefulWidget {
   const NeetFlowApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NeetFlowApp> createState() => _NeetFlowAppState();
+}
+
+class _NeetFlowAppState extends ConsumerState<NeetFlowApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize Background Sync Service after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      BackgroundSyncService.instance.init(ref);
+    });
+  }
+
+  @override
+  void dispose() {
+    BackgroundSyncService.instance.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeProvider);
 

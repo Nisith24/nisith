@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/theme_provider.dart';
 
 import '../../auth/providers/auth_provider.dart';
+import '../../stats/providers/user_stats_provider.dart';
 
 /// ProfileScreen - Settings and user info
 /// Matches React Native (tabs)/profile.tsx
@@ -96,7 +97,7 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
 
                   // Stats
-                  _StatsSection(profile: profile),
+                  const _StatsSection(),
 
                   const SizedBox(height: 24),
 
@@ -174,23 +175,19 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _StatsSection extends StatelessWidget {
-  final dynamic profile;
-
-  const _StatsSection({this.profile});
+class _StatsSection extends ConsumerWidget {
+  const _StatsSection();
 
   @override
-  Widget build(BuildContext context) {
-    final viewed = profile?.viewedMcqIds.length ?? 0;
-    final bookmarked = profile?.bookmarkedMcqIds.length ?? 0;
-    final streak = profile?.streakDays ?? 0;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(localUserStatsProvider);
 
     return Row(
       children: [
         Expanded(
           child: _StatCard(
             label: 'Viewed',
-            value: '$viewed',
+            value: '${stats.viewedCount}',
             icon: LucideIcons.eye,
             color: context.primaryColor,
           ),
@@ -199,7 +196,7 @@ class _StatsSection extends StatelessWidget {
         Expanded(
           child: _StatCard(
             label: 'Bookmarked',
-            value: '$bookmarked',
+            value: '${stats.bookmarkCount}',
             icon: LucideIcons.bookmark,
             color: context.warningColor,
           ),
@@ -208,7 +205,7 @@ class _StatsSection extends StatelessWidget {
         Expanded(
           child: _StatCard(
             label: 'Streak',
-            value: '$streak',
+            value: '${stats.streakDays}',
             icon: LucideIcons.flame,
             color: context.errorColor,
           ),
