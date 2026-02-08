@@ -100,13 +100,24 @@ class UserProfile {
       bookmarkedMcqIds:
           (json['bookmarkedMcqIds'] as List<dynamic>?)?.cast<String>() ?? [],
       streakDays: json['streakDays'] as int? ?? 0,
-      lastActive:
-          json['lastActive'] as int? ?? DateTime.now().millisecondsSinceEpoch,
+      lastActive: _parseTimestamp(json['lastActive']),
       analytics: json['analytics'] != null
           ? UserAnalytics.fromJson(
               Map<String, dynamic>.from(json['analytics'] as Map))
           : null,
     );
+  }
+
+  static int _parseTimestamp(dynamic value) {
+    if (value == null) return DateTime.now().millisecondsSinceEpoch;
+    if (value is int) return value;
+    // Check for Firebase Timestamp (without direct dependency if possible, or use dynamic)
+    // In Dart, we can check for .millisecondsSinceEpoch if it's a Timestamp
+    if (value.runtimeType.toString() == 'Timestamp' ||
+        value.runtimeType.toString().contains('Timestamp')) {
+      return (value as dynamic).millisecondsSinceEpoch;
+    }
+    return DateTime.now().millisecondsSinceEpoch;
   }
 
   Map<String, dynamic> toJson() => {

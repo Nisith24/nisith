@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class AppTextField extends StatelessWidget {
   final String label;
@@ -7,7 +8,9 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onSubmitted;
+  final ValueChanged<String>? onChanged;
   final IconData? prefixIcon;
+  final Widget? suffixIcon;
   final String? errorText;
 
   const AppTextField({
@@ -18,7 +21,9 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.textInputAction,
     this.onSubmitted,
+    this.onChanged,
     this.prefixIcon,
+    this.suffixIcon,
     this.errorText,
   });
 
@@ -33,9 +38,13 @@ class AppTextField extends StatelessWidget {
           obscureText: obscureText,
           textInputAction: textInputAction,
           onSubmitted: onSubmitted,
+          onChanged: onChanged,
           decoration: InputDecoration(
             labelText: label,
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+            prefixIcon: prefixIcon != null
+                ? Icon(prefixIcon, color: context.iconColor)
+                : null,
+            suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(

@@ -5,7 +5,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import 'widgets/flashcard_deck.dart';
 import 'widgets/mock_test_config.dart';
+import '../../../core/models/models.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../exam/providers/exam_provider.dart';
 
 /// LearnScreen - Flashcards and Mock Test configuration
 /// Matches React Native (tabs)/learn.tsx
@@ -39,14 +41,15 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         return MockTestConfig(
           onBack: () => setState(() => _view = 'menu'),
           onStart: (config) {
-            // In RN, this navigates to a test screen or sets global state
-            // For now, let's just show a snackbar and go back to menu,
-            // since ExamScreen handles the actual test via separate route/provider
-            // Ideally, we'd start the exam provider here and navigate to /exam
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Test started! (Check Exam tab)')),
-            );
-            // Example hookup: ref.read(examStateProvider.notifier).startTestWithConfig(config);
+            final notifier = ref.read(examStateProvider.notifier);
+
+            if (config.containsKey('pack')) {
+              notifier.startTestWithPack(config['pack'] as QuestionPack);
+            } else {
+              notifier.startTestWithConfig(config);
+            }
+
+            context.push('/exam');
             setState(() => _view = 'menu');
           },
         );

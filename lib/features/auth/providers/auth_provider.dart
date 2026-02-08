@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/models/user_profile.dart';
 import '../../../core/storage/hive_service.dart';
+import '../../../core/storage/local_storage_service.dart';
+import '../../mcq/repositories/mcq_repository.dart';
 
 /// Auth state - matches React Native AuthContext
 class AuthState {
@@ -50,14 +52,12 @@ final userProfileProvider = Provider<UserProfile?>((ref) {
 class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final LocalStorageService _storage = LocalStorageService.instance;
+  final MCQRepository _mcqRepo = MCQRepository.instance;
 
   StreamSubscription<User?>? _authSubscription;
-
-  // Viewed MCQ batching - matches React Native implementation
-  final List<String> _viewedQueue = [];
   Timer? _syncTimer;
-  static const _batchSize = 25;
-  static const _syncInterval = Duration(minutes: 5);
+  static const _syncInterval = Duration(minutes: 2);
 
   AuthNotifier() : super(const AsyncValue.loading()) {
     _init();
@@ -65,6 +65,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
   Future<void> _init() async {
     _authSubscription = _auth.authStateChanges().listen(_onAuthStateChanged);
+    // Start background sync timer
+    _syncTimer = Timer.periodic(_syncInterval, (_) => _performBackgroundSync());
   }
 
   Future<void> _onAuthStateChanged(User? user) async {
@@ -72,6 +74,9 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       state = const AsyncValue.data(
           AuthState(user: null, userProfile: null, isLoading: false));
       HiveService.setBool(StorageKeys.authState, false);
+      HiveService.removeString(StorageKeys.cachedUserProfile);
+      await _storage.clearUserProgress();
+      _mcqRepo.clearMemoryCache();
       return;
     }
 
@@ -79,48 +84,65 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     HiveService.setBool(StorageKeys.authState, true);
 
     try {
+      UserProfile? profile;
+
       // Try cached profile first
       final cachedProfile = HiveService.getJson(StorageKeys.cachedUserProfile);
       if (cachedProfile != null) {
         try {
-          final profile = UserProfile.fromJson(cachedProfile);
-          if (profile.uid == user.uid) {
-            state = AsyncValue.data(
-                AuthState(user: user, userProfile: profile, isLoading: false));
+          final tempProfile = UserProfile.fromJson(cachedProfile);
+          if (tempProfile.uid == user.uid) {
+            profile = tempProfile;
+          } else {
+            // Wrong user cached! Clear everything immediately
+            await _storage.clearUserProgress();
+            _mcqRepo.clearMemoryCache();
           }
         } catch (e) {
           debugPrint('Error parsing cached profile: $e');
         }
+      } else {
+        // No cache, clear storage to prevent ghost data from previous session
+        await _storage.clearUserProgress();
+        _mcqRepo.clearMemoryCache();
       }
 
-      // Fetch fresh profile
-      final doc = await _firestore.collection('users').doc(user.uid).get();
-      UserProfile profile;
-
-      if (doc.exists) {
-        profile = UserProfile.fromJson(doc.data()!);
-      } else {
-        // Create default profile
-        profile = UserProfile.createDefault(
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-        );
-        await _firestore
-            .collection('users')
-            .doc(user.uid)
-            .set(profile.toJson());
+      // Fetch fresh profile from Firestore
+      if (profile == null) {
+        final doc = await _firestore.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          profile = UserProfile.fromJson(doc.data()!);
+        } else {
+          // Create default profile
+          profile = UserProfile.createDefault(
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          );
+          // Wait for profile creation
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .set(profile.toJson());
+        }
       }
 
       // Cache profile
       await HiveService.setJson(
           StorageKeys.cachedUserProfile, profile.toJson());
 
+      // HYDRATE LOCAL STORAGE from Profile
+      // This ensures UserStatsProvider has the correct initial data
+      await _storage.setViewedMcqIds(profile.viewedMcqIds);
+      await _storage.setBookmarkedMcqIds(profile.bookmarkedMcqIds);
+
+      // Trigger full MCQ sync if needed
+      if (_storage.isCacheStale()) {
+        _mcqRepo.performFullSync().ignore();
+      }
+
       state = AsyncValue.data(
           AuthState(user: user, userProfile: profile, isLoading: false));
-
-      // Sync any pending viewed MCQs
-      _syncViewedToFirebase();
     } catch (e, stack) {
       debugPrint('Auth State Change Error: $e\n$stack');
       state = AsyncValue.error(e, stack);
@@ -174,60 +196,90 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   /// Sign out
   Future<void> signOut() async {
     try {
-      await _syncViewedToFirebase();
+      await _performBackgroundSync(); // Sync before signout
       await _auth.signOut();
       await HiveService.removeString(StorageKeys.cachedUserProfile);
+      await _storage.clearUserProgress(); // Clear local user data
+      _mcqRepo.clearMemoryCache();
     } catch (e) {
       debugPrint('SignOut Error: $e');
     }
   }
 
-  /// Mark MCQ as viewed - batched for performance
+  /// Mark MCQ as viewed - Uses Local Repository for instant update
   void markMcqViewed(String mcqId) {
-    _viewedQueue.add(mcqId);
+    _mcqRepo.markAsViewed(mcqId);
 
-    // Optimistic local update
-    final current = state.valueOrNull;
-    if (current?.userProfile != null) {
-      final updatedProfile = current!.userProfile!.copyWith(
-        viewedMcqIds: [...current.userProfile!.viewedMcqIds, mcqId],
-      );
-      state = AsyncValue.data(current.copyWith(userProfile: updatedProfile));
-    }
-
-    // Sync if batch size reached
-    if (_viewedQueue.length >= _batchSize) {
-      _syncViewedToFirebase();
-    } else {
-      // Schedule sync
-      _syncTimer?.cancel();
-      _syncTimer = Timer(_syncInterval, _syncViewedToFirebase);
-    }
+    // Also update local state for consistency if needed
+    // But mostly purely relies on Hive now via UserStatsProvider
   }
 
-  /// Sync viewed MCQs to Firebase
-  Future<void> _syncViewedToFirebase() async {
-    final uid = state.valueOrNull?.user?.uid;
-    if (uid == null || _viewedQueue.isEmpty) return;
-
-    final toSync = List<String>.from(_viewedQueue);
-    _viewedQueue.clear();
+  /// Sync viewed and bookmarked MCQs to Firebase
+  Future<void> _performBackgroundSync() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null || !_storage.hasPendingSync()) return;
 
     try {
-      // Chunk large arrays (Firestore limit)
-      const chunkSize = 400;
-      for (var i = 0; i < toSync.length; i += chunkSize) {
-        final chunk =
-            toSync.sublist(i, (i + chunkSize).clamp(0, toSync.length));
-        await _firestore.collection('users').doc(uid).set({
-          'viewedMcqIds': FieldValue.arrayUnion(chunk),
-          'lastActive': DateTime.now().millisecondsSinceEpoch,
-        }, SetOptions(merge: true));
+      final batch = _firestore.batch();
+      final userRef = _firestore.collection('users').doc(uid);
+      bool hasUpdates = false;
+
+      // 1. Sync Viewed
+      final viewedToAdd = _storage.getPendingViewedSync();
+      if (viewedToAdd.isNotEmpty) {
+        // Chunk if necessary, but for now simple union
+        batch.set(
+            userRef,
+            {
+              'viewedMcqIds': FieldValue.arrayUnion(viewedToAdd),
+              'lastActive': DateTime.now().millisecondsSinceEpoch,
+            },
+            SetOptions(merge: true));
+        hasUpdates = true;
+      }
+
+      // 2. Sync Bookmarks Add
+      final bookmarksToAdd = _storage.getPendingBookmarkAddSync();
+      if (bookmarksToAdd.isNotEmpty) {
+        batch.set(
+            userRef,
+            {
+              'bookmarkedMcqIds': FieldValue.arrayUnion(bookmarksToAdd),
+            },
+            SetOptions(merge: true));
+        hasUpdates = true;
+      }
+
+      // 3. Sync Bookmarks Remove
+      final bookmarksToRemove = _storage.getPendingBookmarkRemoveSync();
+      if (bookmarksToRemove.isNotEmpty) {
+        batch.set(
+            userRef,
+            {
+              'bookmarkedMcqIds': FieldValue.arrayRemove(bookmarksToRemove),
+            },
+            SetOptions(merge: true));
+        hasUpdates = true;
+      }
+
+      if (hasUpdates) {
+        await batch.commit();
+
+        // Clear queues on success
+        if (viewedToAdd.isNotEmpty) {
+          await _storage.clearSyncQueue(LocalKeys.syncQueueViewed);
+        }
+        if (bookmarksToAdd.isNotEmpty) {
+          await _storage.clearSyncQueue(LocalKeys.syncQueueBookmarksAdd);
+        }
+        if (bookmarksToRemove.isNotEmpty) {
+          await _storage.clearSyncQueue(LocalKeys.syncQueueBookmarksRemove);
+        }
+
+        debugPrint('[AuthNotifier] Background sync completed successfully');
       }
     } catch (e) {
-      // Re-add to queue on failure
-      debugPrint('Sync Error: $e');
-      _viewedQueue.insertAll(0, toSync);
+      debugPrint('[AuthNotifier] Background sync failed: $e');
     }
   }
 

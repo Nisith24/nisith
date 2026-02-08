@@ -9,6 +9,7 @@ import '../../features/learn/ui/learn_screen.dart';
 import '../../features/settings/ui/profile_screen.dart';
 import '../../features/stats/ui/analytics_screen.dart';
 import '../../features/shared/widgets/scaffold_with_nav.dart';
+import '../../features/exam/ui/exam_screen.dart';
 import '../../features/bookmarks/ui/bookmarks_screen.dart';
 import '../../features/bookmarks/ui/bookmark_deck_screen.dart';
 
@@ -56,6 +57,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final subject = state.uri.queryParameters['subject'];
           return BookmarkDeckScreen(subjectFilter: subject);
         },
+      ),
+
+      // Exam route
+      GoRoute(
+        path: '/exam',
+        builder: (context, state) => const ExamScreen(),
       ),
 
       // Main shell with floating nav

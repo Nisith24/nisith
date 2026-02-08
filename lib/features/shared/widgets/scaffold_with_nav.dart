@@ -40,6 +40,10 @@ class _ScaffoldWithFloatingNavState extends State<ScaffoldWithFloatingNav> {
 
   @override
   Widget build(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+    final hideNav =
+        location.startsWith('/exam') || location.startsWith('/bookmarks');
+
     return Scaffold(
       body: Stack(
         children: [
@@ -47,10 +51,11 @@ class _ScaffoldWithFloatingNavState extends State<ScaffoldWithFloatingNav> {
           widget.child,
 
           // Floating nav
-          FloatingNav(
-            currentIndex: _currentIndex,
-            onTap: _onNavTap,
-          ),
+          if (!hideNav)
+            FloatingNav(
+              currentIndex: _currentIndex,
+              onTap: _onNavTap,
+            ),
         ],
       ),
     );

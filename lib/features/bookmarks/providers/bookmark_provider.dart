@@ -3,10 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/models.dart';
 import '../../mcq/repositories/mcq_repository.dart';
 
+import '../../auth/providers/auth_provider.dart';
+
 /// Bookmark state provider - Local-First Implementation
 /// Uses MCQRepository for all data access
 final bookmarkStateProvider =
     StateNotifierProvider<BookmarkNotifier, List<MCQ>>((ref) {
+  // Watch auth state to trigger rebuild on user change
+  ref.watch(authStateProvider);
   return BookmarkNotifier();
 });
 

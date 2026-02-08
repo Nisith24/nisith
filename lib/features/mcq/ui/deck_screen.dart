@@ -159,7 +159,7 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
   Widget _buildCardStack(
       List<MCQ> cards, int activeIndex, DeckState deckState) {
     // Render up to 10 cards ahead for smoothness
-    final visibleCount = 10;
+    const visibleCount = 10;
 
     // We only take what is available
     final available = cards.skip(activeIndex).take(visibleCount).toList();

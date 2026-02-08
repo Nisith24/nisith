@@ -8,6 +8,7 @@ class MCQ {
   final int correctAnswerIndex;
   final String? explanation;
   final List<String>? examTags;
+  final String? imageUrl;
 
   const MCQ({
     required this.id,
@@ -18,13 +19,15 @@ class MCQ {
     required this.correctAnswerIndex,
     this.explanation,
     this.examTags,
+    this.imageUrl,
   });
 
-  factory MCQ.fromJson(Map<String, dynamic> json, {String? packId, int? index}) {
+  factory MCQ.fromJson(Map<String, dynamic> json,
+      {String? packId, int? index}) {
     // Handle both 'question' and 'text' fields
     final rawText = json['question'] ?? json['text'] ?? 'Question text missing';
     final cleanedText = _sanitizeText(rawText as String);
-    
+
     // Normalize correct answer index
     int correctIndex = 0;
     if (json['correctAnswerIndex'] is int) {
@@ -40,7 +43,8 @@ class MCQ {
     } else if (packId != null && index != null) {
       id = '${packId}_q_$index';
     } else {
-      id = json['id']?.toString() ?? 'unknown_${DateTime.now().millisecondsSinceEpoch}';
+      id = json['id']?.toString() ??
+          'unknown_${DateTime.now().millisecondsSinceEpoch}';
     }
 
     return MCQ(
@@ -52,36 +56,42 @@ class MCQ {
       correctAnswerIndex: correctIndex,
       explanation: json['explanation'] as String?,
       examTags: (json['exam_tags'] as List<dynamic>?)?.cast<String>(),
+      imageUrl: json['imageUrl'] as String? ?? json['image_url'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'subject': subject,
-    'topic': topic,
-    'question': question,
-    'options': options,
-    'correctAnswerIndex': correctAnswerIndex,
-    'explanation': explanation,
-    'exam_tags': examTags,
-  };
+        'id': id,
+        'subject': subject,
+        'topic': topic,
+        'question': question,
+        'options': options,
+        'correctAnswerIndex': correctAnswerIndex,
+        'explanation': explanation,
+        'exam_tags': examTags,
+        'imageUrl': imageUrl,
+      };
 
   /// Sanitize question text - remove trailing options/answers
   static String _sanitizeText(String text) {
     if (text.isEmpty) return 'Question text missing';
-    
+
     // Remove "Options:" prefix or "A. ..." block at the end
-    String clean = text.replaceAll(
-      RegExp(r'(\n|\s)+(Options:|A\.|a\))[\s\S]*$'),
-      '',
-    ).trim();
-    
+    String clean = text
+        .replaceAll(
+          RegExp(r'(\n|\s)+(Options:|A\.|a\))[\s\S]*$'),
+          '',
+        )
+        .trim();
+
     // Remove trailing "Answer:" key
-    clean = clean.replaceAll(
-      RegExp(r'(\n|\s)+(Answer:|Ans:|Correct Answer:)[\s\S]*$'),
-      '',
-    ).trim();
-    
+    clean = clean
+        .replaceAll(
+          RegExp(r'(\n|\s)+(Answer:|Ans:|Correct Answer:)[\s\S]*$'),
+          '',
+        )
+        .trim();
+
     return clean;
   }
 
@@ -94,6 +104,7 @@ class MCQ {
     int? correctAnswerIndex,
     String? explanation,
     List<String>? examTags,
+    String? imageUrl,
   }) {
     return MCQ(
       id: id ?? this.id,
@@ -104,6 +115,7 @@ class MCQ {
       correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
       explanation: explanation ?? this.explanation,
       examTags: examTags ?? this.examTags,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 }

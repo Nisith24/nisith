@@ -226,6 +226,11 @@ class LocalStorageService {
     await _progressBox.put(LocalKeys.viewedMcqIds, ids);
   }
 
+  /// Bulk set bookmarked MCQ IDs (for initial sync from Firebase)
+  Future<void> setBookmarkedMcqIds(List<String> ids) async {
+    await _progressBox.put(LocalKeys.bookmarkedMcqIds, ids);
+  }
+
   /// Get bookmarked MCQ IDs
   List<String> getBookmarkedMcqIds() {
     return _progressBox.get(LocalKeys.bookmarkedMcqIds) ?? [];
@@ -388,11 +393,19 @@ class LocalStorageService {
 
   /// Clear everything (for logout)
   Future<void> clearAll() async {
-    await _progressBox.clear();
-    await _metaBox.clear();
-    await _syncQueueBox.clear();
+    await clearUserProgress();
     for (final box in _subjectBoxes.values) {
       await box.clear();
     }
+  }
+
+  /// Clear ONLY user progress (Viewed, Bookmarks, Stats) - Keeps MCQ Content
+  Future<void> clearUserProgress() async {
+    await _progressBox.clear();
+    await _syncQueueBox.clear();
+    // Clear specific meta keys related to user
+    await _metaBox.delete(LocalKeys.statsData);
+    await _metaBox.delete(LocalKeys.bookmarkedMcqs);
+    // Note: We keep lastFullSyncTime and cacheVersion as they are global/content related
   }
 }

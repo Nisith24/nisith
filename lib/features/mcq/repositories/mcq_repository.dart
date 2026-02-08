@@ -153,6 +153,27 @@ class MCQRepository {
     return _localStorage.isBookmarked(mcqId);
   }
 
+  /// Get questions for Mock Test
+  Future<List<MCQ>> getQuestionsForMockTest({
+    required int count,
+    List<String>? subjects,
+  }) async {
+    final allMcqs = await getAllMCQs();
+    if (allMcqs.isEmpty) return [];
+
+    List<MCQ> pool;
+    if (subjects != null && subjects.isNotEmpty) {
+      pool = allMcqs.where((q) => subjects.contains(q.subject)).toList();
+    } else {
+      pool = List.from(allMcqs);
+    }
+
+    if (pool.isEmpty) return [];
+
+    pool.shuffle(Random());
+    return pool.take(count).toList();
+  }
+
   // ══════════════════════════════════════════════════════════════════════════
   // Sync Operations (Called by BackgroundSyncService)
   // ══════════════════════════════════════════════════════════════════════════
@@ -232,6 +253,11 @@ class MCQRepository {
   Future<void> clearCache() async {
     _sessionCache = null;
     await _localStorage.clearMcqCache();
+  }
+
+  /// Clear memory cache only (for logout)
+  void clearMemoryCache() {
+    _sessionCache = null;
   }
 
   // ══════════════════════════════════════════════════════════════════════════

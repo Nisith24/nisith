@@ -111,7 +111,7 @@ class _SwipeableCardState extends State<SwipeableCard>
     // Slight vertical drift based on random or previous momentum?
     // Since we track 0 Y, let's keep it straight or slightly arc-ed?
     // Straight is cleaner for "Next".
-    final endY = 0.0;
+    const endY = 0.0;
 
     _animation = Tween<Offset>(
       begin: _dragOffset,

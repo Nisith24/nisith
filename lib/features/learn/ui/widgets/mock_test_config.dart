@@ -26,6 +26,7 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
   String _selectedMode = 'rapid';
   int _selectedCount = 10;
   final List<String> _selectedSubjects = [];
+  final TextEditingController _customCountController = TextEditingController();
 
   static const modes = [
     {
@@ -51,25 +52,60 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
     },
   ];
 
-  static const counts = [10, 20, 30, 50];
+  static const counts = [10, 20, 30, 50, 100];
   static const subjects = [
     'Anatomy',
     'Physiology',
     'Biochemistry',
     'Pathology',
-    'Pharmacology'
+    'Microbiology',
+    'Pharmacology',
+    'Forensic Medicine',
+    'Community Medicine',
+    'ENT',
+    'Ophthalmology',
+    'Medicine',
+    'Surgery',
+    'OBG',
+    'Pediatrics',
+    'Psychiatry',
+    'Radiology',
+    'Dermatology',
+    'Anesthesia',
+    'Orthopedics'
   ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.index == 1 && _tabController.indexIsChanging) {
+        // Prevent switching to Packs tab
+        _tabController.index = 0;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Packs are currently disabled.'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    });
+    _customCountController.text = _selectedCount.toString();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _customCountController.dispose();
+    super.dispose();
   }
 
   void _handleStart() {
+    final count = int.tryParse(_customCountController.text) ?? _selectedCount;
     widget.onStart?.call({
       'mode': _selectedMode,
-      'count': _selectedCount,
+      'count': count,
       'subjects': _selectedSubjects.isEmpty ? subjects : _selectedSubjects,
     });
   }
@@ -120,9 +156,22 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
                   unselectedLabelColor: context.textSecondaryColor,
                   dividerColor: Colors.transparent,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  tabs: const [
-                    Tab(text: 'Custom'),
-                    Tab(text: 'Packs'),
+                  tabs: [
+                    const Tab(text: 'Custom'),
+                    Tab(
+                      child: Opacity(
+                        opacity: 0.5,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Packs'),
+                            const SizedBox(width: 4),
+                            Icon(LucideIcons.lock,
+                                size: 12, color: context.textSecondaryColor),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -151,80 +200,79 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
       padding: const EdgeInsets.all(24),
       children: [
         _buildSectionTitle('SELECT MODE'),
-        ...modes.map((mode) {
-          final isSelected = _selectedMode == mode['id'];
-          final color = mode['color'] as Color;
+        SizedBox(
+          height: 65,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: modes.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final mode = modes[index];
+              final isSelected = _selectedMode == mode['id'];
+              final color = mode['color'] as Color;
 
-          return GestureDetector(
-            onTap: () => setState(() => _selectedMode = mode['id'] as String),
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: context.cardSurfaceColor,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isSelected ? color : Colors.transparent,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(mode['icon'] as IconData,
-                        color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          mode['title'] as String,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: context.textColor,
-                          ),
-                        ),
-                        Text(
-                          mode['subtitle'] as String,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: context.textSecondaryColor,
-                          ),
-                        ),
-                      ],
+              return GestureDetector(
+                onTap: () =>
+                    setState(() => _selectedMode = mode['id'] as String),
+                child: Container(
+                  width: 110,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: context.cardSurfaceColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected ? color : context.borderColor,
+                      width: isSelected ? 1.5 : 1,
                     ),
                   ),
-                  if (isSelected)
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Icon(mode['icon'] as IconData,
+                            color: Colors.white, size: 14),
                       ),
-                      child: const Icon(LucideIcons.check,
-                          color: Colors.white, size: 12),
-                    ),
-                ],
-              ),
-            ),
-          );
-        }),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              (mode['title'] as String).split(' ').first,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: context.textColor,
+                              ),
+                            ),
+                            Text(
+                              mode['subtitle'] as String,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 8,
+                                color: context.textSecondaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
         const SizedBox(height: 24),
         _buildSectionTitle('NUMBER OF QUESTIONS'),
         Row(
@@ -232,7 +280,10 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
             final isSelected = _selectedCount == count;
             return Expanded(
               child: GestureDetector(
-                onTap: () => setState(() => _selectedCount = count),
+                onTap: () => setState(() {
+                  _selectedCount = count;
+                  _customCountController.text = count.toString();
+                }),
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   height: 48,
@@ -258,6 +309,44 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
               ),
             );
           }).toList(),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _customCountController,
+          keyboardType: TextInputType.number,
+          style:
+              TextStyle(color: context.textColor, fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            hintText: 'Custom Amount (e.g. 75)',
+            hintStyle: TextStyle(
+                color: context.textSecondaryColor.withValues(alpha: 0.5)),
+            prefixIcon:
+                Icon(LucideIcons.hash, color: context.primaryColor, size: 20),
+            filled: true,
+            fillColor: context.cardSurfaceColor,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: context.borderColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: context.borderColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: context.primaryColor, width: 2),
+            ),
+          ),
+          onChanged: (val) {
+            final n = int.tryParse(val);
+            if (n != null && counts.contains(n)) {
+              setState(() => _selectedCount = n);
+            } else {
+              setState(() => _selectedCount = -1); // Deselect presets
+            }
+          },
         ),
         const SizedBox(height: 24),
         _buildSectionTitle('SELECT SUBJECTS'),
