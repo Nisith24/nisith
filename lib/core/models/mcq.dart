@@ -118,4 +118,42 @@ class MCQ {
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MCQ &&
+        other.id == id &&
+        other.subject == subject &&
+        other.topic == topic &&
+        other.question == question &&
+        _listEquals(other.options, options) &&
+        other.correctAnswerIndex == correctAnswerIndex &&
+        other.explanation == explanation &&
+        _listEquals(other.examTags, examTags) &&
+        other.imageUrl == imageUrl;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        subject.hashCode ^
+        topic.hashCode ^
+        question.hashCode ^
+        Object.hashAll(options) ^
+        correctAnswerIndex.hashCode ^
+        explanation.hashCode ^
+        (examTags != null ? Object.hashAll(examTags!) : 0) ^
+        imageUrl.hashCode;
+  }
+
+  bool _listEquals<T>(List<T>? a, List<T>? b) {
+    if (a == null) return b == null;
+    if (b == null || a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 }
