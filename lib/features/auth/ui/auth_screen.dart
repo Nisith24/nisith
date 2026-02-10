@@ -266,6 +266,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               size: 20,
                               color: context.iconColor,
                             ),
+                            tooltip: _obscurePassword
+                                ? 'Show password'
+                                : 'Hide password',
                             onPressed: () => setState(
                                 () => _obscurePassword = !_obscurePassword),
                           ),
