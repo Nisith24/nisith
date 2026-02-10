@@ -31,7 +31,8 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           side: BorderSide(
-              color: backgroundColor ?? Theme.of(context).primaryColor),
+            color: backgroundColor ?? Theme.of(context).primaryColor,
+          ),
           foregroundColor:
               textColor ?? backgroundColor ?? Theme.of(context).primaryColor,
         ),
@@ -43,9 +44,7 @@ class AppButton extends StatelessWidget {
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         backgroundColor: backgroundColor ?? Theme.of(context).primaryColor,
         foregroundColor: textColor ?? Colors.white,
         elevation: 0,
@@ -75,9 +74,10 @@ class AppButton extends StatelessWidget {
         children: [
           Icon(icon, size: 20),
           const SizedBox(width: 8),
-          Text(text,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          ),
         ],
       );
     }

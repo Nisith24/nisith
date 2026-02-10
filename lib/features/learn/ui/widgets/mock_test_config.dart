@@ -34,21 +34,21 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
       'title': 'Blaze Mode',
       'subtitle': '10s per question',
       'color': Color(0xFFf59e0b),
-      'icon': LucideIcons.zap
+      'icon': LucideIcons.zap,
     },
     {
       'id': 'rapid',
       'title': 'Rapid Fire',
       'subtitle': '30s per question',
       'color': Color(0xFF3b82f6),
-      'icon': LucideIcons.clock
+      'icon': LucideIcons.clock,
     },
     {
       'id': 'calm',
       'title': 'Calm Mode',
       'subtitle': 'No time limit',
       'color': Color(0xFF10b981),
-      'icon': LucideIcons.coffee
+      'icon': LucideIcons.coffee,
     },
   ];
 
@@ -72,7 +72,7 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
     'Radiology',
     'Dermatology',
     'Anesthesia',
-    'Orthopedics'
+    'Orthopedics',
   ];
 
   @override
@@ -166,8 +166,11 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
                           children: [
                             const Text('Packs'),
                             const SizedBox(width: 4),
-                            Icon(LucideIcons.lock,
-                                size: 12, color: context.textSecondaryColor),
+                            Icon(
+                              LucideIcons.lock,
+                              size: 12,
+                              color: context.textSecondaryColor,
+                            ),
                           ],
                         ),
                       ),
@@ -183,10 +186,7 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                children: [
-                  _buildCustomTab(),
-                  _buildPacksTab(),
-                ],
+                children: [_buildCustomTab(), _buildPacksTab()],
               ),
             ),
           ],
@@ -216,8 +216,10 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
                     setState(() => _selectedMode = mode['id'] as String),
                 child: Container(
                   width: 110,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: context.cardSurfaceColor,
                     borderRadius: BorderRadius.circular(12),
@@ -235,8 +237,11 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
                           color: color,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Icon(mode['icon'] as IconData,
-                            color: Colors.white, size: 14),
+                        child: Icon(
+                          mode['icon'] as IconData,
+                          color: Colors.white,
+                          size: 14,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -314,18 +319,26 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
         TextField(
           controller: _customCountController,
           keyboardType: TextInputType.number,
-          style:
-              TextStyle(color: context.textColor, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: context.textColor,
+            fontWeight: FontWeight.w600,
+          ),
           decoration: InputDecoration(
             hintText: 'Custom Amount (e.g. 75)',
             hintStyle: TextStyle(
-                color: context.textSecondaryColor.withValues(alpha: 0.5)),
-            prefixIcon:
-                Icon(LucideIcons.hash, color: context.primaryColor, size: 20),
+              color: context.textSecondaryColor.withValues(alpha: 0.5),
+            ),
+            prefixIcon: Icon(
+              LucideIcons.hash,
+              color: context.primaryColor,
+              size: 20,
+            ),
             filled: true,
             fillColor: context.cardSurfaceColor,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: context.borderColor),
@@ -366,8 +379,10 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
                 }
               }),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? context.primaryColor
@@ -380,8 +395,9 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color:
-                        isSelected ? Colors.white : context.textSecondaryColor,
+                    color: isSelected
+                        ? Colors.white
+                        : context.textSecondaryColor,
                   ),
                 ),
               ),
@@ -397,7 +413,8 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
             style: ElevatedButton.styleFrom(
               backgroundColor: context.textColor, // Dark button
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28)),
+                borderRadius: BorderRadius.circular(28),
+              ),
               elevation: 8,
             ),
             child: const Row(
@@ -444,14 +461,18 @@ class _MockTestConfigState extends ConsumerState<MockTestConfig>
                 title: Text(
                   pack.title,
                   style: TextStyle(
-                      fontWeight: FontWeight.w700, color: context.textColor),
+                    fontWeight: FontWeight.w700,
+                    color: context.textColor,
+                  ),
                 ),
                 subtitle: Text(
                   '${pack.subject} • ${pack.questions.length} Questions',
                   style: TextStyle(color: context.textSecondaryColor),
                 ),
-                trailing: Icon(LucideIcons.chevronRight,
-                    color: context.textSecondaryColor),
+                trailing: Icon(
+                  LucideIcons.chevronRight,
+                  color: context.textSecondaryColor,
+                ),
                 onTap: () {
                   // Handle pack start
                   widget.onStart?.call({'pack': pack});

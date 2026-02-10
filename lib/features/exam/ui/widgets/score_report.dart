@@ -9,8 +9,11 @@ class ScoreReportView extends StatelessWidget {
   final ExamState examState;
   final WidgetRef ref;
 
-  const ScoreReportView(
-      {super.key, required this.examState, required this.ref});
+  const ScoreReportView({
+    super.key,
+    required this.examState,
+    required this.ref,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +52,20 @@ class ScoreReportView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _StatItem(
-                      label: 'Correct',
-                      value: '$correct',
-                      color: context.successColor),
+                    label: 'Correct',
+                    value: '$correct',
+                    color: context.successColor,
+                  ),
                   _StatItem(
-                      label: 'Wrong',
-                      value: '$wrong',
-                      color: context.errorColor),
+                    label: 'Wrong',
+                    value: '$wrong',
+                    color: context.errorColor,
+                  ),
                   _StatItem(
-                      label: 'Skipped',
-                      value: '$skipped',
-                      color: context.textSecondaryColor),
+                    label: 'Skipped',
+                    value: '$skipped',
+                    color: context.textSecondaryColor,
+                  ),
                 ],
               ),
             ),
@@ -74,12 +80,15 @@ class ScoreReportView extends StatelessWidget {
                       onPressed: () =>
                           ref.read(examStateProvider.notifier).reset(),
                       icon: Icon(LucideIcons.home, color: context.textColor),
-                      label: Text('Home',
-                          style: TextStyle(color: context.textColor)),
+                      label: Text(
+                        'Home',
+                        style: TextStyle(color: context.textColor),
+                      ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         side: BorderSide(color: context.borderColor),
                       ),
                     ),
@@ -94,7 +103,8 @@ class ScoreReportView extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
                   ),
@@ -124,8 +134,9 @@ class ScoreReportView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
               child: Column(
-                children:
-                    examState.currentQuestions.asMap().entries.map((entry) {
+                children: examState.currentQuestions.asMap().entries.map((
+                  entry,
+                ) {
                   final index = entry.key;
                   final q = entry.value;
                   final userAnswer = examState.userAnswers[q.id];
@@ -148,8 +159,8 @@ class ScoreReportView extends StatelessWidget {
     Color borderColor = percentage >= 70
         ? context.successColor
         : percentage >= 40
-            ? context.warningColor
-            : context.errorColor;
+        ? context.warningColor
+        : context.errorColor;
 
     return Column(
       children: [
@@ -194,8 +205,11 @@ class _StatItem extends StatelessWidget {
   final String value;
   final Color color;
 
-  const _StatItem(
-      {required this.label, required this.value, required this.color});
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +218,10 @@ class _StatItem extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w800, color: color),
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: color,
+          ),
         ),
         Text(
           label,
@@ -259,14 +276,23 @@ class _ReviewItemState extends State<_ReviewItem> {
                 children: [
                   // Status Icon
                   if (isSkipped)
-                    Icon(LucideIcons.minusCircle,
-                        color: context.textSecondaryColor, size: 24)
+                    Icon(
+                      LucideIcons.minusCircle,
+                      color: context.textSecondaryColor,
+                      size: 24,
+                    )
                   else if (isCorrect)
-                    Icon(LucideIcons.checkCircle,
-                        color: context.successColor, size: 24)
+                    Icon(
+                      LucideIcons.checkCircle,
+                      color: context.successColor,
+                      size: 24,
+                    )
                   else
-                    Icon(LucideIcons.xCircle,
-                        color: context.errorColor, size: 24),
+                    Icon(
+                      LucideIcons.xCircle,
+                      color: context.errorColor,
+                      size: 24,
+                    ),
 
                   const SizedBox(width: 12),
 
@@ -378,11 +404,17 @@ class _ReviewItemState extends State<_ReviewItem> {
                             ),
                           ),
                           if (isOptCorrect)
-                            Icon(LucideIcons.check,
-                                size: 16, color: context.successColor),
+                            Icon(
+                              LucideIcons.check,
+                              size: 16,
+                              color: context.successColor,
+                            ),
                           if (isOptSelected && !isOptCorrect)
-                            Icon(LucideIcons.x,
-                                size: 16, color: context.errorColor),
+                            Icon(
+                              LucideIcons.x,
+                              size: 16,
+                              color: context.errorColor,
+                            ),
                         ],
                       ),
                     );
@@ -396,8 +428,11 @@ class _ReviewItemState extends State<_ReviewItem> {
                         color: context.cardSurfaceColor,
                         borderRadius: BorderRadius.circular(8),
                         border: Border(
-                            left: BorderSide(
-                                color: context.primaryColor, width: 4)),
+                          left: BorderSide(
+                            color: context.primaryColor,
+                            width: 4,
+                          ),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

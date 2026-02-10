@@ -9,10 +9,10 @@ import '../../auth/providers/auth_provider.dart';
 /// Uses MCQRepository for all data access
 final bookmarkStateProvider =
     StateNotifierProvider<BookmarkNotifier, List<MCQ>>((ref) {
-  // Watch auth state to trigger rebuild on user change
-  ref.watch(authStateProvider);
-  return BookmarkNotifier();
-});
+      // Watch auth state to trigger rebuild on user change
+      ref.watch(authStateProvider);
+      return BookmarkNotifier();
+    });
 
 class BookmarkNotifier extends StateNotifier<List<MCQ>> {
   final MCQRepository _repository = MCQRepository.instance;

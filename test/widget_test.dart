@@ -14,7 +14,6 @@ import 'package:neetflow_flutter/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    // Build our app and trigger a frame.
     await tester.pumpWidget(const ProviderScope(child: NeetFlowApp()));
     await tester.pumpAndSettle();
 

@@ -114,7 +114,6 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
 
                   // Mock Test Config removed as requested
-
                   _SettingsTile(
                     icon: LucideIcons.moon,
                     title: 'Dark Mode',
@@ -159,7 +158,8 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                            color: context.errorColor.withValues(alpha: 0.5)),
+                          color: context.errorColor.withValues(alpha: 0.5),
+                        ),
                       ),
                     ),
                   ),
@@ -250,10 +250,7 @@ class _StatCard extends StatelessWidget {
           ),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              color: context.textSecondaryColor,
-            ),
+            style: TextStyle(fontSize: 12, color: context.textSecondaryColor),
           ),
         ],
       ),
@@ -290,10 +287,7 @@ class _SettingsTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: context.textColor,
-                  ),
+                  style: TextStyle(fontSize: 16, color: context.textColor),
                 ),
               ),
               if (trailing != null)

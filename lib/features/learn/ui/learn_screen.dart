@@ -66,10 +66,7 @@ class _MenuView extends StatelessWidget {
   final VoidCallback onFlashcards;
   final VoidCallback onMockTest;
 
-  const _MenuView({
-    required this.onFlashcards,
-    required this.onMockTest,
-  });
+  const _MenuView({required this.onFlashcards, required this.onMockTest});
 
   @override
   Widget build(BuildContext context) {
@@ -78,10 +75,7 @@ class _MenuView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Learn',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
+          Text('Learn', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 24),
           _MenuCard(
             icon: LucideIcons.layers,
@@ -178,10 +172,7 @@ class _MenuCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                LucideIcons.chevronRight,
-                color: context.iconColor,
-              ),
+              Icon(LucideIcons.chevronRight, color: context.iconColor),
             ],
           ),
         ),

@@ -158,37 +158,31 @@ class BackgroundSyncService with WidgetsBindingObserver {
         // Chunk large arrays (Firestore limit is 500 per operation)
         for (var i = 0; i < pendingViewed.length; i += 400) {
           final chunk = pendingViewed.sublist(
-              i, (i + 400).clamp(0, pendingViewed.length));
-          batch.set(
-            userRef,
-            {
-              'viewedMcqIds': FieldValue.arrayUnion(chunk),
-              'lastActive': FieldValue.serverTimestamp(),
-            },
-            SetOptions(merge: true),
+            i,
+            (i + 400).clamp(0, pendingViewed.length),
           );
+          batch.set(userRef, {
+            'viewedMcqIds': FieldValue.arrayUnion(chunk),
+            'lastActive': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
         }
       }
 
       // Sync bookmark additions
       final pendingBookmarkAdd = _localStorage.getPendingBookmarkAddSync();
       if (pendingBookmarkAdd.isNotEmpty) {
-        batch.set(
-          userRef,
-          {'bookmarked_ids': FieldValue.arrayUnion(pendingBookmarkAdd)},
-          SetOptions(merge: true),
-        );
+        batch.set(userRef, {
+          'bookmarked_ids': FieldValue.arrayUnion(pendingBookmarkAdd),
+        }, SetOptions(merge: true));
       }
 
       // Sync bookmark removals
-      final pendingBookmarkRemove =
-          _localStorage.getPendingBookmarkRemoveSync();
+      final pendingBookmarkRemove = _localStorage
+          .getPendingBookmarkRemoveSync();
       if (pendingBookmarkRemove.isNotEmpty) {
-        batch.set(
-          userRef,
-          {'bookmarked_ids': FieldValue.arrayRemove(pendingBookmarkRemove)},
-          SetOptions(merge: true),
-        );
+        batch.set(userRef, {
+          'bookmarked_ids': FieldValue.arrayRemove(pendingBookmarkRemove),
+        }, SetOptions(merge: true));
       }
 
       // Commit batch
@@ -200,7 +194,8 @@ class BackgroundSyncService with WidgetsBindingObserver {
       await _localStorage.clearSyncQueue(LocalKeys.syncQueueBookmarksRemove);
 
       debugPrint(
-          '[BackgroundSync] Sync complete: ${pendingViewed.length} viewed, ${pendingBookmarkAdd.length} bookmarks added');
+        '[BackgroundSync] Sync complete: ${pendingViewed.length} viewed, ${pendingBookmarkAdd.length} bookmarks added',
+      );
     } catch (e) {
       debugPrint('[BackgroundSync] Sync failed (will retry): $e');
       // Queue stays intact for retry

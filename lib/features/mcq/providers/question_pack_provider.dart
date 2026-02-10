@@ -24,8 +24,9 @@ final questionPacksProvider = FutureProvider<List<QuestionPack>>((ref) async {
   final user = ref.watch(currentUserProvider);
   if (user == null) return [];
 
-  final snapshot =
-      await FirebaseFirestore.instance.collection('question_packs').get();
+  final snapshot = await FirebaseFirestore.instance
+      .collection('question_packs')
+      .get();
 
   return snapshot.docs
       .map((doc) => QuestionPack.fromJson(doc.data(), doc.id))
@@ -63,8 +64,10 @@ class DeckFetchParams {
 }
 
 /// Weighted MCQ selection - matching React Native logic + Subject Filtering
-final weightedMCQsProvider =
-    Provider.family<List<MCQ>, DeckFetchParams>((ref, params) {
+final weightedMCQsProvider = Provider.family<List<MCQ>, DeckFetchParams>((
+  ref,
+  params,
+) {
   final allQuestions = ref.watch(allQuestionsProvider);
   final userProfile = ref.watch(userProfileProvider);
 
@@ -73,8 +76,9 @@ final weightedMCQsProvider =
   final viewedIds = userProfile?.viewedMcqIds.toSet() ?? {};
 
   // 1. Filter by View Status
-  final unviewed =
-      allQuestions.where((q) => !viewedIds.contains(q.id)).toList();
+  final unviewed = allQuestions
+      .where((q) => !viewedIds.contains(q.id))
+      .toList();
   var pool = unviewed.length >= params.count ? unviewed : allQuestions;
 
   // 2. Filter by Subject if requested
@@ -87,10 +91,12 @@ final weightedMCQsProvider =
     // BUT we need to re-check if the 'unviewed' logic reduced the pool too much for this specific subject.
 
     // Better approach: Apply subject filter to ALL questions first, then check viewed/unviewed.
-    final subjectQuestions =
-        allQuestions.where((q) => q.subject == params.subject).toList();
-    final subjectUnviewed =
-        subjectQuestions.where((q) => !viewedIds.contains(q.id)).toList();
+    final subjectQuestions = allQuestions
+        .where((q) => q.subject == params.subject)
+        .toList();
+    final subjectUnviewed = subjectQuestions
+        .where((q) => !viewedIds.contains(q.id))
+        .toList();
 
     pool = subjectUnviewed.length >= params.count
         ? subjectUnviewed
@@ -111,8 +117,10 @@ final weightedMCQsProvider =
   }
 
   final subjects = bySubject.keys.toList();
-  final totalWeight =
-      subjects.fold<int>(0, (total, s) => total + (subjectWeights[s] ?? 5));
+  final totalWeight = subjects.fold<int>(
+    0,
+    (total, s) => total + (subjectWeights[s] ?? 5),
+  );
 
   final selected = <MCQ>[];
   final random = Random();

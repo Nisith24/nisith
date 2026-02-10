@@ -54,10 +54,7 @@ class _FloatingNavState extends State<FloatingNav>
     );
 
     _rotationAnimation = Tween<double>(begin: 0, end: math.pi).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOutBack,
-      ),
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
     );
   }
 
@@ -101,8 +98,8 @@ class _FloatingNavState extends State<FloatingNav>
             decoration: BoxDecoration(
               color: _isExpanded
                   ? (isDark
-                      ? AppColors.dark.cardSurface
-                      : AppColors.light.cardSurface)
+                        ? AppColors.dark.cardSurface
+                        : AppColors.light.cardSurface)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(25),
               border: _isExpanded
@@ -117,7 +114,7 @@ class _FloatingNavState extends State<FloatingNav>
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.15),
 
-// ... rest of the file
+                    // ... rest of the file
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                     spreadRadius: -2,
@@ -160,11 +157,11 @@ class _FloatingNavState extends State<FloatingNav>
                                   item.icon,
                                   color: isSelected
                                       ? (isDark
-                                          ? AppColors.dark.primary
-                                          : AppColors.light.primary)
+                                            ? AppColors.dark.primary
+                                            : AppColors.light.primary)
                                       : (isDark
-                                          ? AppColors.dark.icon
-                                          : AppColors.light.icon),
+                                            ? AppColors.dark.icon
+                                            : AppColors.light.icon),
                                   size: 18,
                                 ),
                               ),
@@ -204,10 +201,11 @@ class _FloatingNavState extends State<FloatingNav>
                           boxShadow: [
                             if (!_isExpanded)
                               BoxShadow(
-                                color: (isDark
-                                        ? AppColors.dark.primary
-                                        : AppColors.light.primary)
-                                    .withValues(alpha: 0.3),
+                                color:
+                                    (isDark
+                                            ? AppColors.dark.primary
+                                            : AppColors.light.primary)
+                                        .withValues(alpha: 0.3),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),

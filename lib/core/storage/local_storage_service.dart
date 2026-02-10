@@ -117,8 +117,11 @@ class LocalStorageService {
 
   /// Store MCQs for a subject (Merging/Appending by default)
   /// Set [clearFirst] to true to replace entire cache for this subject
-  Future<void> storeMCQsForSubject(String subject, List<MCQ> mcqs,
-      {bool clearFirst = false}) async {
+  Future<void> storeMCQsForSubject(
+    String subject,
+    List<MCQ> mcqs, {
+    bool clearFirst = false,
+  }) async {
     final key = SubjectKeys.toKey(subject);
     final box = await _getSubjectBox(key);
 
@@ -133,7 +136,8 @@ class LocalStorageService {
     }
 
     debugPrint(
-        '[LocalStorage] Stored ${mcqs.length} MCQs for $subject (Total: ${box.length})');
+      '[LocalStorage] Stored ${mcqs.length} MCQs for $subject (Total: ${box.length})',
+    );
   }
 
   /// Clear cache for a specific subject
@@ -166,8 +170,9 @@ class LocalStorageService {
     final allMcqs = <MCQ>[];
 
     for (final subjectKey in SubjectKeys.all) {
-      final mcqs =
-          await getMCQsForSubject(SubjectKeys.toDisplayName(subjectKey));
+      final mcqs = await getMCQsForSubject(
+        SubjectKeys.toDisplayName(subjectKey),
+      );
       allMcqs.addAll(mcqs);
     }
 
@@ -253,8 +258,10 @@ class LocalStorageService {
 
     if (!bookmarks.any((b) => b.id == mcq.id)) {
       bookmarks.add(mcq);
-      await _metaBox.put(LocalKeys.bookmarkedMcqs,
-          jsonEncode(bookmarks.map((b) => b.toJson()).toList()));
+      await _metaBox.put(
+        LocalKeys.bookmarkedMcqs,
+        jsonEncode(bookmarks.map((b) => b.toJson()).toList()),
+      );
     }
 
     // Add to sync queue
@@ -274,8 +281,10 @@ class LocalStorageService {
         .map((e) => MCQ.fromJson(e as Map<String, dynamic>))
         .where((b) => b.id != mcqId)
         .toList();
-    await _metaBox.put(LocalKeys.bookmarkedMcqs,
-        jsonEncode(bookmarks.map((b) => b.toJson()).toList()));
+    await _metaBox.put(
+      LocalKeys.bookmarkedMcqs,
+      jsonEncode(bookmarks.map((b) => b.toJson()).toList()),
+    );
 
     // Add to sync queue
     await _addToSyncQueue(LocalKeys.syncQueueBookmarksRemove, mcqId);
@@ -353,7 +362,9 @@ class LocalStorageService {
   /// Set last full sync timestamp
   Future<void> setLastFullSyncTime(DateTime time) async {
     await _metaBox.put(
-        LocalKeys.lastFullSyncTime, time.millisecondsSinceEpoch.toString());
+      LocalKeys.lastFullSyncTime,
+      time.millisecondsSinceEpoch.toString(),
+    );
   }
 
   /// Check if cache is stale (older than 24 hours)

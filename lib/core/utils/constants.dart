@@ -17,11 +17,11 @@ enum TimerMode {
   blaze(30, 'Blaze', '30s per question'),
   rapid(60, 'Rapid', '1 min per question'),
   calm(120, 'Calm', '2 min per question');
-  
+
   final int seconds;
   final String label;
   final String description;
-  
+
   const TimerMode(this.seconds, this.label, this.description);
 }
 

@@ -62,8 +62,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       setState(() => _emailError = 'Email is required');
       hasError = true;
     } else if (!RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(email)) {
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    ).hasMatch(email)) {
       setState(() => _emailError = 'Please enter a valid email');
       hasError = true;
     }
@@ -136,7 +136,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     } catch (e) {
       if (mounted) {
         setState(
-            () => _error = 'An unexpected error occurred: ${e.toString()}');
+          () => _error = 'An unexpected error occurred: ${e.toString()}',
+        );
       }
     } finally {
       if (mounted && !_isSuccess) {
@@ -199,20 +200,26 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               color: context.errorBgColor,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                  color: context.errorColor
-                                      .withValues(alpha: 0.3)),
+                                color: context.errorColor.withValues(
+                                  alpha: 0.3,
+                                ),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                Icon(LucideIcons.alertCircle,
-                                    color: context.errorColor, size: 20),
+                                Icon(
+                                  LucideIcons.alertCircle,
+                                  color: context.errorColor,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     _error!,
                                     style: TextStyle(
-                                        color: context.errorColor,
-                                        fontSize: 13),
+                                      color: context.errorColor,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -267,7 +274,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               color: context.iconColor,
                             ),
                             onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword),
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                           ),
                           textInputAction: TextInputAction.done,
                           onSubmitted: (_) => _handleSubmit(),

@@ -63,7 +63,8 @@ class MCQRepository {
     if (localMcqs.isNotEmpty) {
       _sessionCache = localMcqs;
       debugPrint(
-          '[MCQRepository] Loaded ${localMcqs.length} MCQs from local cache');
+        '[MCQRepository] Loaded ${localMcqs.length} MCQs from local cache',
+      );
       return localMcqs;
     }
 
@@ -114,10 +115,12 @@ class MCQRepository {
 
     // Apply subject filter if specified
     if (subjectFilter != null) {
-      final subjectPool =
-          pool.where((q) => q.subject == subjectFilter).toList();
-      final unviewedSubject =
-          subjectPool.where((q) => !viewed.contains(q.id)).toList();
+      final subjectPool = pool
+          .where((q) => q.subject == subjectFilter)
+          .toList();
+      final unviewedSubject = subjectPool
+          .where((q) => !viewed.contains(q.id))
+          .toList();
 
       pool = unviewedSubject.length >= count ? unviewedSubject : subjectPool;
 
@@ -223,7 +226,8 @@ class MCQRepository {
       _sessionCache = await _localStorage.getAllCachedMCQs();
 
       debugPrint(
-          '[MCQRepository] Full sync complete: ${_sessionCache!.length} MCQs across ${bySubject.length} subjects');
+        '[MCQRepository] Full sync complete: ${_sessionCache!.length} MCQs across ${bySubject.length} subjects',
+      );
     } catch (e) {
       debugPrint('[MCQRepository] Full sync failed: $e');
       rethrow;
@@ -280,8 +284,10 @@ class MCQRepository {
     }
 
     final subjects = bySubject.keys.toList();
-    final totalWeight =
-        subjects.fold<int>(0, (total, s) => total + (subjectWeights[s] ?? 5));
+    final totalWeight = subjects.fold<int>(
+      0,
+      (total, s) => total + (subjectWeights[s] ?? 5),
+    );
 
     final selected = <MCQ>[];
     final random = Random();

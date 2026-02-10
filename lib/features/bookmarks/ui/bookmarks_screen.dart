@@ -23,11 +23,9 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
     final allBookmarks = ref.watch(bookmarkStateProvider);
 
     // Grouping for chips
-    final subjects = allBookmarks
-        .map((e) => e.subject ?? 'General')
-        .toSet()
-        .toList()
-      ..sort();
+    final subjects =
+        allBookmarks.map((e) => e.subject ?? 'General').toSet().toList()
+          ..sort();
 
     // Filter logic
     final displayedBookmarks = _selectedSubject == null
@@ -38,9 +36,9 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
       appBar: AppBar(
         title: Text(
           'Bookmarks',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -50,8 +48,10 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
         actions: [
           if (displayedBookmarks.isNotEmpty)
             IconButton(
-              icon:
-                  const Icon(LucideIcons.playCircle, color: Colors.blueAccent),
+              icon: const Icon(
+                LucideIcons.playCircle,
+                color: Colors.blueAccent,
+              ),
               tooltip: 'Review these as Deck',
               onPressed: () {
                 final uri = Uri(
@@ -97,7 +97,8 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
                           selected: isSelected,
                           onSelected: (val) {
                             setState(
-                                () => _selectedSubject = val ? subject : null);
+                              () => _selectedSubject = val ? subject : null,
+                            );
                           },
                         );
                       },
@@ -108,7 +109,8 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
                 Expanded(
                   child: displayedBookmarks.isEmpty
                       ? const Center(
-                          child: Text('No bookmarks for this subject'))
+                          child: Text('No bookmarks for this subject'),
+                        )
                       : ListView.separated(
                           padding: const EdgeInsets.all(20),
                           itemCount: displayedBookmarks.length,
@@ -160,9 +162,7 @@ class _BookmarksScreenState extends ConsumerState<BookmarksScreen> {
           const SizedBox(height: 8),
           Text(
             'Save questions to review them later',
-            style: TextStyle(
-              color: context.textSecondaryColor,
-            ),
+            style: TextStyle(color: context.textSecondaryColor),
           ),
         ],
       ),

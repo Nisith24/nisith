@@ -19,10 +19,10 @@ class SubjectStats {
   }
 
   Map<String, dynamic> toJson() => {
-        'viewed': viewed,
-        'correct': correct,
-        'wrong': wrong,
-      };
+    'viewed': viewed,
+    'correct': correct,
+    'wrong': wrong,
+  };
 
   double get accuracy => viewed > 0 ? (correct / viewed) * 100 : 0;
 }
@@ -44,8 +44,10 @@ class UserAnalytics {
   factory UserAnalytics.fromJson(Map<String, dynamic> json) {
     final subjectWiseRaw = json['subjectWise'] as Map? ?? {};
     final subjectWise = subjectWiseRaw.map(
-      (key, value) => MapEntry(key.toString(),
-          SubjectStats.fromJson(Map<String, dynamic>.from(value as Map))),
+      (key, value) => MapEntry(
+        key.toString(),
+        SubjectStats.fromJson(Map<String, dynamic>.from(value as Map)),
+      ),
     );
 
     return UserAnalytics(
@@ -57,12 +59,13 @@ class UserAnalytics {
   }
 
   Map<String, dynamic> toJson() => {
-        'totalViewed': totalViewed,
-        'totalCorrect': totalCorrect,
-        'totalWrong': totalWrong,
-        'subjectWise':
-            subjectWise.map((key, value) => MapEntry(key, value.toJson())),
-      };
+    'totalViewed': totalViewed,
+    'totalCorrect': totalCorrect,
+    'totalWrong': totalWrong,
+    'subjectWise': subjectWise.map(
+      (key, value) => MapEntry(key, value.toJson()),
+    ),
+  };
 
   double get overallAccuracy =>
       totalViewed > 0 ? (totalCorrect / totalViewed) * 100 : 0;
@@ -103,7 +106,8 @@ class UserProfile {
       lastActive: _parseTimestamp(json['lastActive']),
       analytics: json['analytics'] != null
           ? UserAnalytics.fromJson(
-              Map<String, dynamic>.from(json['analytics'] as Map))
+              Map<String, dynamic>.from(json['analytics'] as Map),
+            )
           : null,
     );
   }
@@ -121,15 +125,15 @@ class UserProfile {
   }
 
   Map<String, dynamic> toJson() => {
-        'uid': uid,
-        'email': email,
-        'displayName': displayName,
-        'viewedMcqIds': viewedMcqIds,
-        'bookmarkedMcqIds': bookmarkedMcqIds,
-        'streakDays': streakDays,
-        'lastActive': lastActive,
-        'analytics': analytics?.toJson(),
-      };
+    'uid': uid,
+    'email': email,
+    'displayName': displayName,
+    'viewedMcqIds': viewedMcqIds,
+    'bookmarkedMcqIds': bookmarkedMcqIds,
+    'streakDays': streakDays,
+    'lastActive': lastActive,
+    'analytics': analytics?.toJson(),
+  };
 
   UserProfile copyWith({
     String? uid,

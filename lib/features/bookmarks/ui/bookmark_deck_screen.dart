@@ -13,10 +13,7 @@ import '../providers/bookmark_provider.dart';
 class BookmarkDeckScreen extends ConsumerStatefulWidget {
   final String? subjectFilter;
 
-  const BookmarkDeckScreen({
-    super.key,
-    this.subjectFilter,
-  });
+  const BookmarkDeckScreen({super.key, this.subjectFilter});
 
   @override
   ConsumerState<BookmarkDeckScreen> createState() => _BookmarkDeckScreenState();
@@ -54,10 +51,8 @@ class _BookmarkDeckScreenState extends ConsumerState<BookmarkDeckScreen> {
                       children: [
                         Text(
                           widget.subjectFilter ?? 'All Bookmarks',
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         if (!_isFinished && cards.isNotEmpty)
                           Text(
@@ -85,14 +80,14 @@ class _BookmarkDeckScreenState extends ConsumerState<BookmarkDeckScreen> {
                       ),
                     )
                   : _isFinished
-                      ? _buildFinishedView(context)
-                      : IndexedStack(
-                          index: 0,
-                          children: [
-                            // Current Card with swipe logic
-                            _buildCardStack(cards),
-                          ],
-                        ),
+                  ? _buildFinishedView(context)
+                  : IndexedStack(
+                      index: 0,
+                      children: [
+                        // Current Card with swipe logic
+                        _buildCardStack(cards),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -105,8 +100,9 @@ class _BookmarkDeckScreenState extends ConsumerState<BookmarkDeckScreen> {
 
     final card = cards[_currentIndex];
     // Show next card behind for depth (if exists)
-    final nextCard =
-        (_currentIndex + 1 < cards.length) ? cards[_currentIndex + 1] : null;
+    final nextCard = (_currentIndex + 1 < cards.length)
+        ? cards[_currentIndex + 1]
+        : null;
 
     return Stack(
       children: [

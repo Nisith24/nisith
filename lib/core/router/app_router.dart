@@ -38,11 +38,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       // Auth route (no shell)
-      // Auth route (no shell)
-      GoRoute(
-        path: '/auth',
-        builder: (context, state) => const AuthScreen(),
-      ),
+      GoRoute(path: '/auth', builder: (context, state) => const AuthScreen()),
 
       // Bookmarks route
       GoRoute(
@@ -60,10 +56,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // Exam route
-      GoRoute(
-        path: '/exam',
-        builder: (context, state) => const ExamScreen(),
-      ),
+      GoRoute(path: '/exam', builder: (context, state) => const ExamScreen()),
 
       // Main shell with floating nav
       ShellRoute(
@@ -72,35 +65,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: DeckScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: DeckScreen()),
           ),
           GoRoute(
             path: '/learn',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: LearnScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: LearnScreen()),
           ),
           GoRoute(
             path: '/profile',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: ProfileScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: ProfileScreen()),
           ),
           GoRoute(
             path: '/analytics',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: AnalyticsScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: AnalyticsScreen()),
           ),
         ],
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Text('Page not found: ${state.uri}'),
-      ),
-    ),
+    errorBuilder: (context, state) =>
+        Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
   );
 });
