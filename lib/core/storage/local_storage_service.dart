@@ -126,11 +126,10 @@ class LocalStorageService {
       await box.clear();
     }
 
-    // Store each MCQ as JSON string with ID as key
+    // Store MCQs in bulk using putAll for better performance
     // This performs an UPSERT (Update if exists, Insert if new)
-    for (final mcq in mcqs) {
-      await box.put(mcq.id, jsonEncode(mcq.toJson()));
-    }
+    final mcqMap = {for (final mcq in mcqs) mcq.id: jsonEncode(mcq.toJson())};
+    await box.putAll(mcqMap);
 
     debugPrint(
         '[LocalStorage] Stored ${mcqs.length} MCQs for $subject (Total: ${box.length})');
