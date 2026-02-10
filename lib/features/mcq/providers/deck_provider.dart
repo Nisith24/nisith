@@ -30,8 +30,9 @@ class DeckState {
       cards: cards ?? this.cards,
       activeIndex: activeIndex ?? this.activeIndex,
       isLoading: isLoading ?? this.isLoading,
-      selectedSubject:
-          clearSubject ? null : (selectedSubject ?? this.selectedSubject),
+      selectedSubject: clearSubject
+          ? null
+          : (selectedSubject ?? this.selectedSubject),
     );
   }
 }
@@ -84,10 +85,7 @@ class DeckNotifier extends StateNotifier<DeckState> {
       );
 
       if (mounted) {
-        state = state.copyWith(
-          cards: questions,
-          isLoading: false,
-        );
+        state = state.copyWith(cards: questions, isLoading: false);
       }
 
       debugPrint('[Deck] Loaded ${questions.length} initial cards');
@@ -133,13 +131,12 @@ class DeckNotifier extends StateNotifier<DeckState> {
 
     // Filter duplicates
     final currentIds = state.cards.map((e) => e.id).toSet();
-    final unique =
-        moreQuestions.where((q) => !currentIds.contains(q.id)).toList();
+    final unique = moreQuestions
+        .where((q) => !currentIds.contains(q.id))
+        .toList();
 
     if (unique.isNotEmpty && mounted) {
-      state = state.copyWith(
-        cards: [...state.cards, ...unique],
-      );
+      state = state.copyWith(cards: [...state.cards, ...unique]);
       debugPrint('[Deck] Loaded ${unique.length} more cards');
     }
   }

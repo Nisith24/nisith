@@ -12,7 +12,8 @@ class LoggerProviderObserver extends ProviderObserver {
   ) {
     if (kDebugMode) {
       debugPrint(
-          '[Riverpod] ${provider.name ?? provider.runtimeType} updated: $newValue');
+        '[Riverpod] ${provider.name ?? provider.runtimeType} updated: $newValue',
+      );
     }
   }
 
@@ -24,7 +25,8 @@ class LoggerProviderObserver extends ProviderObserver {
     ProviderContainer container,
   ) {
     debugPrint(
-        '[Riverpod] ${provider.name ?? provider.runtimeType} failed: $error');
+      '[Riverpod] ${provider.name ?? provider.runtimeType} failed: $error',
+    );
     debugPrint(stackTrace.toString());
   }
 }

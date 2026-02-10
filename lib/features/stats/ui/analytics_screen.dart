@@ -168,8 +168,8 @@ class AnalyticsScreen extends ConsumerWidget {
                               color: stats.accuracy >= 70
                                   ? context.successColor
                                   : stats.accuracy >= 40
-                                      ? context.warningColor
-                                      : context.errorColor,
+                                  ? context.warningColor
+                                  : context.errorColor,
                             ),
                           ),
                         ],
@@ -184,8 +184,8 @@ class AnalyticsScreen extends ConsumerWidget {
                             stats.accuracy >= 70
                                 ? context.successColor
                                 : stats.accuracy >= 40
-                                    ? context.warningColor
-                                    : context.errorColor,
+                                ? context.warningColor
+                                : context.errorColor,
                           ),
                           minHeight: 6,
                         ),
@@ -235,10 +235,7 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: context.textSecondaryColor,
-          ),
+          style: TextStyle(fontSize: 12, color: context.textSecondaryColor),
         ),
       ],
     );

@@ -142,19 +142,20 @@ class _MCQCardState extends ConsumerState<MCQCard>
                         AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 400),
                           curve: Curves.easeOutCubic,
-                          textAlign:
-                              _revealed ? TextAlign.start : TextAlign.center,
+                          textAlign: _revealed
+                              ? TextAlign.start
+                              : TextAlign.center,
                           style: TextStyle(
                             fontSize: _revealed ? 17 : 24,
-                            fontWeight:
-                                _revealed ? FontWeight.w500 : FontWeight.w600,
+                            fontWeight: _revealed
+                                ? FontWeight.w500
+                                : FontWeight.w600,
                             color: context.textColor,
                             height: _revealed ? 1.5 : 1.3,
                             letterSpacing: _revealed ? 0 : -0.5,
-                            fontFamily: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.fontFamily,
+                            fontFamily: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge?.fontFamily,
                           ),
                           child: Text(widget.mcq.question),
                         ),
@@ -202,8 +203,10 @@ class _MCQCardState extends ConsumerState<MCQCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: context.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -211,9 +214,10 @@ class _MCQCardState extends ConsumerState<MCQCard>
                   child: Text(
                     widget.mcq.subject ?? 'General',
                     style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: context.primaryColor),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: context.primaryColor,
+                    ),
                   ),
                 ),
                 if (widget.mcq.topic != null) ...[
@@ -269,8 +273,11 @@ class _MCQCardState extends ConsumerState<MCQCard>
                 opacity: 0.5 + _hintController.value * 0.5,
                 child: Column(
                   children: [
-                    Icon(LucideIcons.mousePointer2,
-                        size: 40, color: context.primaryColor),
+                    Icon(
+                      LucideIcons.mousePointer2,
+                      size: 40,
+                      color: context.primaryColor,
+                    ),
                     const SizedBox(height: 12),
                     const Text(
                       'Tap to reveal',
@@ -327,7 +334,9 @@ class _FocusModeScreenState extends State<_FocusModeScreen>
   void initState() {
     super.initState();
     _fadeController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
     _fadeController.forward();
   }
 
@@ -354,7 +363,9 @@ class _FocusModeScreenState extends State<_FocusModeScreen>
                     bottom: false,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 8),
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
                       child: Row(
                         children: [
                           IconButton(
@@ -364,7 +375,9 @@ class _FocusModeScreenState extends State<_FocusModeScreen>
                           const Text(
                             'Detailed Explanation',
                             style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 16),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
                           ),
                           const Spacer(),
                           IconButton(
@@ -444,7 +457,9 @@ class _FocusModeScreenState extends State<_FocusModeScreen>
                         style: TextButton.styleFrom(
                           foregroundColor: context.textSecondaryColor,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
                         icon: const Icon(LucideIcons.arrowLeft, size: 20),
                         label: const Text('Back'),
@@ -479,8 +494,10 @@ class _FocusModeScreenState extends State<_FocusModeScreen>
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: isCorrect
                       ? context.successColor.withValues(alpha: 0.1)
@@ -493,8 +510,9 @@ class _FocusModeScreenState extends State<_FocusModeScreen>
                       isCorrect
                           ? LucideIcons.checkCheck
                           : LucideIcons.alertCircle,
-                      color:
-                          isCorrect ? context.successColor : context.errorColor,
+                      color: isCorrect
+                          ? context.successColor
+                          : context.errorColor,
                       size: 16,
                     ),
                     const SizedBox(width: 6),
@@ -574,12 +592,13 @@ class _ActionButton extends StatelessWidget {
   final Color color;
   final bool isPrimary;
 
-  const _ActionButton(
-      {required this.icon,
-      required this.label,
-      required this.onTap,
-      required this.color,
-      this.isPrimary = false});
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.color,
+    this.isPrimary = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -596,9 +615,14 @@ class _ActionButton extends StatelessWidget {
             children: [
               Icon(icon, size: 20, color: color),
               const SizedBox(width: 8),
-              Text(label,
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w700, color: color)),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
             ],
           ),
         ),
@@ -622,7 +646,9 @@ class _FadeInWidgetState extends State<FadeInWidget>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -636,8 +662,9 @@ class _FadeInWidgetState extends State<FadeInWidget>
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-        opacity: _anim,
-        child: ScaleTransition(scale: _anim, child: widget.child));
+      opacity: _anim,
+      child: ScaleTransition(scale: _anim, child: widget.child),
+    );
   }
 }
 
@@ -731,11 +758,17 @@ class _MCQOptionItem extends StatelessWidget {
                 ),
               ),
               if (showResult && isCorrect)
-                Icon(LucideIcons.check,
-                    color: context.successColor, size: isCompact ? 16 : 20)
+                Icon(
+                  LucideIcons.check,
+                  color: context.successColor,
+                  size: isCompact ? 16 : 20,
+                )
               else if (showResult && isSelected && !isCorrect)
-                Icon(LucideIcons.x,
-                    color: context.errorColor, size: isCompact ? 16 : 20),
+                Icon(
+                  LucideIcons.x,
+                  color: context.errorColor,
+                  size: isCompact ? 16 : 20,
+                ),
             ],
           ),
         ),

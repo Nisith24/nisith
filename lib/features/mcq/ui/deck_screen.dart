@@ -77,7 +77,9 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: context.primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -111,8 +113,8 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : cards.isEmpty
-                      ? _buildEmptyState()
-                      : _buildCardStack(cards, activeIndex, deckState),
+                  ? _buildEmptyState()
+                  : _buildCardStack(cards, activeIndex, deckState),
             ),
           ],
         ),
@@ -131,10 +133,7 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
             color: context.successColor,
           ),
           const SizedBox(height: 16),
-          Text(
-            'All caught up!',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('All caught up!', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
             'Come back later for more questions',
@@ -157,7 +156,10 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
   }
 
   Widget _buildCardStack(
-      List<MCQ> cards, int activeIndex, DeckState deckState) {
+    List<MCQ> cards,
+    int activeIndex,
+    DeckState deckState,
+  ) {
     // Render up to 10 cards ahead for smoothness
     const visibleCount = 10;
 
@@ -240,7 +242,7 @@ class _FilterOptionsSheetState extends ConsumerState<_FilterOptionsSheet> {
     'Psychiatry',
     'Dermatology',
     'Radiology',
-    'Anesthesia'
+    'Anesthesia',
   ];
 
   static final Map<String, IconData> _subjectIcons = {
@@ -313,11 +315,11 @@ class _FilterOptionsSheetState extends ConsumerState<_FilterOptionsSheet> {
                   children: [
                     Text(
                       'Deck Settings',
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -0.5,
-                              ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
                     ),
                     Text(
                       'Filter by subject or refresh data',
@@ -428,8 +430,8 @@ class _FilterOptionsSheetState extends ConsumerState<_FilterOptionsSheet> {
         color: isSelected
             ? context.primaryColor.withValues(alpha: 0.1)
             : (context.isDark
-                ? AppColors.dark.cardSurface
-                : AppColors.light.cardSurface),
+                  ? AppColors.dark.cardSurface
+                  : AppColors.light.cardSurface),
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: onTap,
@@ -445,8 +447,8 @@ class _FilterOptionsSheetState extends ConsumerState<_FilterOptionsSheet> {
                     color: isSelected
                         ? context.primaryColor
                         : (context.isDark
-                            ? Colors.grey[850]
-                            : Colors.grey[100]),
+                              ? Colors.grey[850]
+                              : Colors.grey[100]),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
@@ -461,20 +463,27 @@ class _FilterOptionsSheetState extends ConsumerState<_FilterOptionsSheet> {
                     title,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w600,
-                      color:
-                          isSelected ? context.primaryColor : context.textColor,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
+                      color: isSelected
+                          ? context.primaryColor
+                          : context.textColor,
                     ),
                   ),
                 ),
                 if (isSelected)
-                  Icon(LucideIcons.checkCircle2,
-                      size: 20, color: context.primaryColor)
+                  Icon(
+                    LucideIcons.checkCircle2,
+                    size: 20,
+                    color: context.primaryColor,
+                  )
                 else
-                  Icon(LucideIcons.chevronRight,
-                      size: 18,
-                      color: context.textSecondaryColor.withValues(alpha: 0.5)),
+                  Icon(
+                    LucideIcons.chevronRight,
+                    size: 18,
+                    color: context.textSecondaryColor.withValues(alpha: 0.5),
+                  ),
               ],
             ),
           ),

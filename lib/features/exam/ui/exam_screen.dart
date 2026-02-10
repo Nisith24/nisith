@@ -22,17 +22,21 @@ class ExamScreen extends ConsumerWidget {
         child: examState.isLoading
             ? const Center(child: CircularProgressIndicator())
             : examState.error != null
-                ? _ErrorView(error: examState.error!, ref: ref)
-                : switch (examState.testStatus) {
-                    TestStatus.idle => _MockSetupView(
-                        onStart: () =>
-                            ref.read(examStateProvider.notifier).startTest(),
-                      ),
-                    TestStatus.running =>
-                      _MockTestView(examState: examState, ref: ref),
-                    TestStatus.completed =>
-                      ScoreReportView(examState: examState, ref: ref),
-                  },
+            ? _ErrorView(error: examState.error!, ref: ref)
+            : switch (examState.testStatus) {
+                TestStatus.idle => _MockSetupView(
+                  onStart: () =>
+                      ref.read(examStateProvider.notifier).startTest(),
+                ),
+                TestStatus.running => _MockTestView(
+                  examState: examState,
+                  ref: ref,
+                ),
+                TestStatus.completed => ScoreReportView(
+                  examState: examState,
+                  ref: ref,
+                ),
+              },
       ),
     );
   }
@@ -58,8 +62,11 @@ class _ErrorView extends StatelessWidget {
                 color: context.errorColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(LucideIcons.alertTriangle,
-                  color: context.errorColor, size: 48),
+              child: Icon(
+                LucideIcons.alertTriangle,
+                color: context.errorColor,
+                size: 48,
+              ),
             ),
             const SizedBox(height: 24),
             Text(
@@ -84,7 +91,8 @@ class _ErrorView extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: context.textColor,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: const Text('Back to Setup'),
@@ -139,13 +147,22 @@ class _MockSetupView extends StatelessWidget {
             child: Column(
               children: [
                 _buildInfoRow(
-                    context, LucideIcons.checkCircle2, 'Accurate scoring'),
+                  context,
+                  LucideIcons.checkCircle2,
+                  'Accurate scoring',
+                ),
                 const SizedBox(height: 16),
                 _buildInfoRow(
-                    context, LucideIcons.timer, 'Mode-based time limits'),
+                  context,
+                  LucideIcons.timer,
+                  'Mode-based time limits',
+                ),
                 const SizedBox(height: 16),
-                _buildInfoRow(context, LucideIcons.barChart,
-                    'Detailed performance report'),
+                _buildInfoRow(
+                  context,
+                  LucideIcons.barChart,
+                  'Detailed performance report',
+                ),
               ],
             ),
           ),
@@ -159,7 +176,8 @@ class _MockSetupView extends StatelessWidget {
                 backgroundColor: context.primaryColor,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18)),
+                  borderRadius: BorderRadius.circular(18),
+                ),
                 elevation: 0,
               ),
               child: const Text(
@@ -285,8 +303,10 @@ class _MockTestView extends StatelessWidget {
                       errorWidget: (context, url, error) => Container(
                         height: 200,
                         color: context.errorColor.withValues(alpha: 0.1),
-                        child: Icon(LucideIcons.imageOff,
-                            color: context.errorColor),
+                        child: Icon(
+                          LucideIcons.imageOff,
+                          color: context.errorColor,
+                        ),
                       ),
                     ),
                   ),
@@ -335,8 +355,9 @@ class _MockTestView extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? context.primaryColor
-                                      : context.borderColor
-                                          .withValues(alpha: 0.2),
+                                      : context.borderColor.withValues(
+                                          alpha: 0.2,
+                                        ),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Text(
@@ -405,11 +426,12 @@ class _MockTestView extends StatelessWidget {
                   onPressed: isLast
                       ? () => _showFinishDialog(context)
                       : () =>
-                          ref.read(examStateProvider.notifier).nextQuestion(),
+                            ref.read(examStateProvider.notifier).nextQuestion(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: context.textColor,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -464,9 +486,11 @@ class _MockTestView extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Finish Test?'),
-        content: Text(unanswered > 0
-            ? 'You have $unanswered unanswered questions. Submit anyway?'
-            : 'Ready to see your results?'),
+        content: Text(
+          unanswered > 0
+              ? 'You have $unanswered unanswered questions. Submit anyway?'
+              : 'Ready to see your results?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -477,9 +501,13 @@ class _MockTestView extends StatelessWidget {
               Navigator.pop(context);
               ref.read(examStateProvider.notifier).completeTest();
             },
-            child: Text('Submit',
-                style: TextStyle(
-                    color: context.primaryColor, fontWeight: FontWeight.w700)),
+            child: Text(
+              'Submit',
+              style: TextStyle(
+                color: context.primaryColor,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ],
       ),
@@ -586,15 +614,15 @@ class _QuestionNavigator extends StatelessWidget {
                 color: isCurrent
                     ? context.textColor
                     : isAnswered
-                        ? context.primaryColor.withValues(alpha: 0.2)
-                        : context.cardSurfaceColor,
+                    ? context.primaryColor.withValues(alpha: 0.2)
+                    : context.cardSurfaceColor,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isCurrent
                       ? context.textColor
                       : isAnswered
-                          ? context.primaryColor
-                          : context.borderColor,
+                      ? context.primaryColor
+                      : context.borderColor,
                 ),
               ),
               alignment: Alignment.center,
@@ -606,8 +634,8 @@ class _QuestionNavigator extends StatelessWidget {
                   color: isCurrent
                       ? context.cardSurfaceColor
                       : isAnswered
-                          ? context.primaryColor
-                          : context.textSecondaryColor,
+                      ? context.primaryColor
+                      : context.textSecondaryColor,
                 ),
               ),
             ),

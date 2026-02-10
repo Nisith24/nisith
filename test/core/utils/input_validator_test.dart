@@ -11,9 +11,11 @@ void main() {
 
     test('sanitizeDisplayText removes HTML tags', () {
       expect(
-          InputValidator.sanitizeDisplayText(
-              '<script>alert("xss")</script>Hello'),
-          'alert("xss")Hello');
+        InputValidator.sanitizeDisplayText(
+          '<script>alert("xss")</script>Hello',
+        ),
+        'alert("xss")Hello',
+      );
       expect(InputValidator.sanitizeDisplayText('<b>Bold</b>'), 'Bold');
       expect(InputValidator.sanitizeDisplayText('No tags'), 'No tags');
     });

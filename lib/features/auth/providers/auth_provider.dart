@@ -15,17 +15,9 @@ class AuthState {
   final UserProfile? userProfile;
   final bool isLoading;
 
-  const AuthState({
-    this.user,
-    this.userProfile,
-    this.isLoading = true,
-  });
+  const AuthState({this.user, this.userProfile, this.isLoading = true});
 
-  AuthState copyWith({
-    User? user,
-    UserProfile? userProfile,
-    bool? isLoading,
-  }) {
+  AuthState copyWith({User? user, UserProfile? userProfile, bool? isLoading}) {
     return AuthState(
       user: user ?? this.user,
       userProfile: userProfile ?? this.userProfile,
@@ -37,8 +29,8 @@ class AuthState {
 /// Auth state provider
 final authStateProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<AuthState>>((ref) {
-  return AuthNotifier();
-});
+      return AuthNotifier();
+    });
 
 /// Convenience providers
 final currentUserProvider = Provider<User?>((ref) {
@@ -72,7 +64,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   Future<void> _onAuthStateChanged(User? user) async {
     if (user == null) {
       state = const AsyncValue.data(
-          AuthState(user: null, userProfile: null, isLoading: false));
+        AuthState(user: null, userProfile: null, isLoading: false),
+      );
       HiveService.setBool(StorageKeys.authState, false);
       HiveService.removeString(StorageKeys.cachedUserProfile);
       await _storage.clearUserProgress();
@@ -129,7 +122,9 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
       // Cache profile
       await HiveService.setJson(
-          StorageKeys.cachedUserProfile, profile.toJson());
+        StorageKeys.cachedUserProfile,
+        profile.toJson(),
+      );
 
       // HYDRATE LOCAL STORAGE from Profile
       // This ensures UserStatsProvider has the correct initial data
@@ -142,7 +137,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       }
 
       state = AsyncValue.data(
-          AuthState(user: user, userProfile: profile, isLoading: false));
+        AuthState(user: user, userProfile: profile, isLoading: false),
+      );
     } catch (e, stack) {
       debugPrint('Auth State Change Error: $e\n$stack');
       state = AsyncValue.error(e, stack);
@@ -228,37 +224,28 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       final viewedToAdd = _storage.getPendingViewedSync();
       if (viewedToAdd.isNotEmpty) {
         // Chunk if necessary, but for now simple union
-        batch.set(
-            userRef,
-            {
-              'viewedMcqIds': FieldValue.arrayUnion(viewedToAdd),
-              'lastActive': DateTime.now().millisecondsSinceEpoch,
-            },
-            SetOptions(merge: true));
+        batch.set(userRef, {
+          'viewedMcqIds': FieldValue.arrayUnion(viewedToAdd),
+          'lastActive': DateTime.now().millisecondsSinceEpoch,
+        }, SetOptions(merge: true));
         hasUpdates = true;
       }
 
       // 2. Sync Bookmarks Add
       final bookmarksToAdd = _storage.getPendingBookmarkAddSync();
       if (bookmarksToAdd.isNotEmpty) {
-        batch.set(
-            userRef,
-            {
-              'bookmarkedMcqIds': FieldValue.arrayUnion(bookmarksToAdd),
-            },
-            SetOptions(merge: true));
+        batch.set(userRef, {
+          'bookmarkedMcqIds': FieldValue.arrayUnion(bookmarksToAdd),
+        }, SetOptions(merge: true));
         hasUpdates = true;
       }
 
       // 3. Sync Bookmarks Remove
       final bookmarksToRemove = _storage.getPendingBookmarkRemoveSync();
       if (bookmarksToRemove.isNotEmpty) {
-        batch.set(
-            userRef,
-            {
-              'bookmarkedMcqIds': FieldValue.arrayRemove(bookmarksToRemove),
-            },
-            SetOptions(merge: true));
+        batch.set(userRef, {
+          'bookmarkedMcqIds': FieldValue.arrayRemove(bookmarksToRemove),
+        }, SetOptions(merge: true));
         hasUpdates = true;
       }
 

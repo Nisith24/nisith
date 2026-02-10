@@ -22,8 +22,11 @@ class MCQ {
     this.imageUrl,
   });
 
-  factory MCQ.fromJson(Map<String, dynamic> json,
-      {String? packId, int? index}) {
+  factory MCQ.fromJson(
+    Map<String, dynamic> json, {
+    String? packId,
+    int? index,
+  }) {
     // Handle both 'question' and 'text' fields
     final rawText = json['question'] ?? json['text'] ?? 'Question text missing';
     final cleanedText = _sanitizeText(rawText as String);
@@ -43,7 +46,8 @@ class MCQ {
     } else if (packId != null && index != null) {
       id = '${packId}_q_$index';
     } else {
-      id = json['id']?.toString() ??
+      id =
+          json['id']?.toString() ??
           'unknown_${DateTime.now().millisecondsSinceEpoch}';
     }
 
@@ -61,16 +65,16 @@ class MCQ {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'subject': subject,
-        'topic': topic,
-        'question': question,
-        'options': options,
-        'correctAnswerIndex': correctAnswerIndex,
-        'explanation': explanation,
-        'exam_tags': examTags,
-        'imageUrl': imageUrl,
-      };
+    'id': id,
+    'subject': subject,
+    'topic': topic,
+    'question': question,
+    'options': options,
+    'correctAnswerIndex': correctAnswerIndex,
+    'explanation': explanation,
+    'exam_tags': examTags,
+    'imageUrl': imageUrl,
+  };
 
   /// Sanitize question text - remove trailing options/answers
   static String _sanitizeText(String text) {
@@ -78,10 +82,7 @@ class MCQ {
 
     // Remove "Options:" prefix or "A. ..." block at the end
     String clean = text
-        .replaceAll(
-          RegExp(r'(\n|\s)+(Options:|A\.|a\))[\s\S]*$'),
-          '',
-        )
+        .replaceAll(RegExp(r'(\n|\s)+(Options:|A\.|a\))[\s\S]*$'), '')
         .trim();
 
     // Remove trailing "Answer:" key

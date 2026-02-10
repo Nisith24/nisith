@@ -36,14 +36,16 @@ class _FlashcardDeckState extends ConsumerState<FlashcardDeck> {
     final allQuestions = ref.read(allQuestionsProvider);
 
     final converted = allQuestions
-        .map((q) => Flashcard(
-              id: q.id,
-              front: q.question,
-              back: q.options[
-                  q.correctAnswerIndex], // Use correct option as answer
-              subject: q.subject ?? 'General',
-              topic: q.topic,
-            ))
+        .map(
+          (q) => Flashcard(
+            id: q.id,
+            front: q.question,
+            back:
+                q.options[q.correctAnswerIndex], // Use correct option as answer
+            subject: q.subject ?? 'General',
+            topic: q.topic,
+          ),
+        )
         .toList();
 
     converted.shuffle(); // Shuffle as per RN
@@ -109,11 +111,13 @@ class _FlashcardDeckState extends ConsumerState<FlashcardDeck> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(2),
                           child: LinearProgressIndicator(
-                            value:
-                                _cards.isEmpty ? 0 : _completed / _cards.length,
+                            value: _cards.isEmpty
+                                ? 0
+                                : _completed / _cards.length,
                             backgroundColor: context.borderColor,
-                            valueColor:
-                                AlwaysStoppedAnimation(context.primaryColor),
+                            valueColor: AlwaysStoppedAnimation(
+                              context.primaryColor,
+                            ),
                             minHeight: 4,
                           ),
                         ),
@@ -154,9 +158,7 @@ class _FlashcardDeckState extends ConsumerState<FlashcardDeck> {
                 scale: 0.95,
                 child: Opacity(
                   opacity: 0.5,
-                  child: FlashcardItem(
-                    card: _cards[_activeIndex + 1],
-                  ),
+                  child: FlashcardItem(card: _cards[_activeIndex + 1]),
                 ),
               ),
             ),
@@ -168,10 +170,7 @@ class _FlashcardDeckState extends ConsumerState<FlashcardDeck> {
             activeIndex: 0,
             onSwipeUp: _handleSwipe,
             onSwipeDown: _handleSwipe,
-            child: FlashcardItem(
-              card: _cards[_activeIndex],
-              isActive: true,
-            ),
+            child: FlashcardItem(card: _cards[_activeIndex], isActive: true),
           ),
         ],
       ),
@@ -186,8 +185,11 @@ class _FlashcardDeckState extends ConsumerState<FlashcardDeck> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(LucideIcons.checkCircle,
-                  size: 72, color: context.successColor),
+              Icon(
+                LucideIcons.checkCircle,
+                size: 72,
+                color: context.successColor,
+              ),
               const SizedBox(height: 24),
               const Text(
                 'Deck Complete!',
@@ -196,8 +198,10 @@ class _FlashcardDeckState extends ConsumerState<FlashcardDeck> {
               const SizedBox(height: 8),
               Text(
                 'You reviewed $_completed cards',
-                style:
-                    TextStyle(fontSize: 16, color: context.textSecondaryColor),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: context.textSecondaryColor,
+                ),
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
@@ -205,8 +209,10 @@ class _FlashcardDeckState extends ConsumerState<FlashcardDeck> {
                 icon: const Icon(LucideIcons.rotateCcw, size: 18),
                 label: const Text('Start Over'),
                 style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 16,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
