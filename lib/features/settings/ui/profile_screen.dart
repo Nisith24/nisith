@@ -10,7 +10,6 @@ import '../../auth/providers/auth_provider.dart';
 import '../../stats/providers/user_stats_provider.dart';
 
 /// ProfileScreen - Settings and user info
-/// Matches React Native (tabs)/profile.tsx
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -208,6 +207,7 @@ class _StatsSection extends ConsumerWidget {
             value: '${stats.streakDays}',
             icon: LucideIcons.flame,
             color: context.errorColor,
+            isDisabled: true,
           ),
         ),
       ],
@@ -220,12 +220,14 @@ class _StatCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final bool isDisabled;
 
   const _StatCard({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    this.isDisabled = false,
   });
 
   @override
@@ -233,19 +235,42 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: isDisabled
+            ? context.borderColor.withValues(alpha: 0.1)
+            : color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
+        border: isDisabled
+            ? Border.all(color: context.borderColor.withValues(alpha: 0.5))
+            : null,
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isDisabled ? context.textSecondaryColor : color,
+                size: 20,
+              ),
+              if (isDisabled) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  LucideIcons.lock,
+                  size: 14,
+                  color: context.textSecondaryColor,
+                ),
+              ],
+            ],
+          ),
           const SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
-              color: context.textColor,
+              color:
+                  isDisabled ? context.textSecondaryColor : context.textColor,
             ),
           ),
           Text(

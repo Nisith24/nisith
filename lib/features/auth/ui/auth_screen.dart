@@ -10,7 +10,6 @@ import '../../../core/ui/app_text_field.dart';
 import '../providers/auth_provider.dart';
 
 /// AuthScreen - Login and signup
-/// Matches React Native auth.tsx
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 

@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
-/// Hive storage service - replaces React Native AsyncStorage + MMKV
+/// Service for managing local persistent storage using Hive
 class HiveService {
   static late Box _generalBox;
   static late Box<List<String>> _listsBox;

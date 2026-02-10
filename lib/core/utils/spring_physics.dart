@@ -1,9 +1,9 @@
 import 'package:flutter/physics.dart';
 
-/// Spring configurations matching React Native Reanimated
+/// Spring configurations for fluid UI animations
 class SpringConfigs {
   /// Card snap-back spring
-  /// RN: { damping: 28, stiffness: 350, mass: 0.8 }
+  /// Card snap-back spring
   static const cardSnapBack = SpringDescription(
     mass: 0.8,
     stiffness: 350,
@@ -11,7 +11,7 @@ class SpringConfigs {
   );
 
   /// Reset spring (more damped)
-  /// RN: { damping: 35, stiffness: 350, mass: 0.8 }
+  /// Reset spring (more damped)
   static const reset = SpringDescription(
     mass: 0.8,
     stiffness: 350,
@@ -19,7 +19,7 @@ class SpringConfigs {
   );
 
   /// Menu toggle spring
-  /// RN: { damping: 18, stiffness: 120, mass: 0.8 }
+  /// Menu toggle spring
   static const menuToggle = SpringDescription(
     mass: 0.8,
     stiffness: 120,
@@ -27,7 +27,7 @@ class SpringConfigs {
   );
 
   /// Sensor smoothing spring
-  /// RN: { damping: 22, stiffness: 100, mass: 1.0 }
+  /// Sensor smoothing spring
   static const sensorSmooth = SpringDescription(
     mass: 1.0,
     stiffness: 100,
@@ -35,7 +35,7 @@ class SpringConfigs {
   );
 }
 
-/// Animation constants matching React Native implementation
+/// General animation constants used across the application
 class AnimationConstants {
   // Swipe thresholds
   static const double swipeThreshold = 100.0;

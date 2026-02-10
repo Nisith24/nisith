@@ -13,7 +13,6 @@ import '../../features/exam/ui/exam_screen.dart';
 import '../../features/bookmarks/ui/bookmarks_screen.dart';
 import '../../features/bookmarks/ui/bookmark_deck_screen.dart';
 
-/// App router provider - matches React Native Expo Router structure
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 

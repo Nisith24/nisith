@@ -9,7 +9,7 @@ import '../../../core/storage/hive_service.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../mcq/repositories/mcq_repository.dart';
 
-/// Auth state - matches React Native AuthContext
+/// State object for User Authentication
 class AuthState {
   final User? user;
   final UserProfile? userProfile;

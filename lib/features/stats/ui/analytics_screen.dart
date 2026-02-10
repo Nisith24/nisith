@@ -6,7 +6,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// AnalyticsScreen - Statistics display
-/// Matches React Native analytics.tsx
 class AnalyticsScreen extends ConsumerWidget {
   const AnalyticsScreen({super.key});
 

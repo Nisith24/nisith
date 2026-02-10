@@ -1,4 +1,4 @@
-/// Flashcard Model - Matches React Native types
+/// Model representing a Flashcard for active recall learning
 class Flashcard {
   final String id;
   final String front;
@@ -25,10 +25,10 @@ class Flashcard {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'front': front,
-    'back': back,
-    'subject': subject,
-    'topic': topic,
-  };
+        'id': id,
+        'front': front,
+        'back': back,
+        'subject': subject,
+        'topic': topic,
+      };
 }

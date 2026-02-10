@@ -19,7 +19,7 @@ const Map<String, int> subjectWeights = {
   'Physiology': 10,
 };
 
-/// Question packs provider - replaces React Native questionPackStore + useQuestionPacksQuery
+/// Question packs provider
 final questionPacksProvider = FutureProvider<List<QuestionPack>>((ref) async {
   final user = ref.watch(currentUserProvider);
   if (user == null) return [];
@@ -62,7 +62,7 @@ class DeckFetchParams {
   int get hashCode => count.hashCode ^ subject.hashCode;
 }
 
-/// Weighted MCQ selection - matching React Native logic + Subject Filtering
+/// Weighted MCQ selection based on subject filtering and viewed history
 final weightedMCQsProvider =
     Provider.family<List<MCQ>, DeckFetchParams>((ref, params) {
   final allQuestions = ref.watch(allQuestionsProvider);

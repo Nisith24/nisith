@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// App colors matching React Native constants/theme.ts
+/// Application color palette configurations for light and dark modes
 class AppColors {
   // Light theme colors
   static const light = LightColors();

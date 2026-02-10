@@ -1,6 +1,6 @@
 import 'mcq.dart';
 
-/// QuestionPack Model - Matches React Native types/index.ts
+/// Model representing a collection of MCQs within a subject or exam pack
 class QuestionPack {
   final String id;
   final String packId;
@@ -23,7 +23,7 @@ class QuestionPack {
   factory QuestionPack.fromJson(Map<String, dynamic> json, String docId) {
     final packSubject = json['subject'] as String? ?? 'General';
     final packTags = (json['exam_tags'] as List<dynamic>?)?.cast<String>();
-    
+
     final rawQuestions = json['questions'] as List<dynamic>? ?? [];
     final cleanedQuestions = rawQuestions.asMap().entries.map((entry) {
       final q = entry.value as Map<String, dynamic>;
@@ -50,12 +50,12 @@ class QuestionPack {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'pack_id': packId,
-    'title': title,
-    'subject': subject,
-    'is_mixed': isMixed,
-    'questions': questions.map((q) => q.toJson()).toList(),
-    'exam_tags': examTags,
-  };
+        'id': id,
+        'pack_id': packId,
+        'title': title,
+        'subject': subject,
+        'is_mixed': isMixed,
+        'questions': questions.map((q) => q.toJson()).toList(),
+        'exam_tags': examTags,
+      };
 }

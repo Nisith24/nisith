@@ -9,7 +9,7 @@ enum TestStatus { idle, running, completed }
 /// Filter mode enum
 enum FilterMode { subject, exam, mixed }
 
-/// Exam state - matches React Native examStore
+/// State object for the Exam session
 class ExamState {
   final List<MCQ> currentQuestions;
   final String? currentPackId;

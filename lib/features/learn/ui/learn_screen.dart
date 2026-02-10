@@ -10,7 +10,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../exam/providers/exam_provider.dart';
 
 /// LearnScreen - Flashcards and Mock Test configuration
-/// Matches React Native (tabs)/learn.tsx
 class LearnScreen extends ConsumerStatefulWidget {
   const LearnScreen({super.key});
 

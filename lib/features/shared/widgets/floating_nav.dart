@@ -7,7 +7,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/spring_physics.dart';
 
 /// Floating navigation bar with spring animation
-/// Matches React Native (tabs)/_layout.tsx FloatingNav
 class FloatingNav extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;

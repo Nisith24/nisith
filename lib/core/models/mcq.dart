@@ -1,4 +1,4 @@
-/// MCQ Model - Matches React Native types/index.ts
+/// Model representing a Multiple Choice Question (MCQ)
 class MCQ {
   final String id;
   final String? subject;

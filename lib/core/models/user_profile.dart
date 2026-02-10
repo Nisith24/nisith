@@ -68,7 +68,7 @@ class UserAnalytics {
       totalViewed > 0 ? (totalCorrect / totalViewed) * 100 : 0;
 }
 
-/// User Profile - Matches React Native types/index.ts
+/// Model representing user profile data and statistics
 class UserProfile {
   final String uid;
   final String? email;

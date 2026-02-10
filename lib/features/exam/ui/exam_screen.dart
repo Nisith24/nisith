@@ -9,7 +9,6 @@ import '../providers/exam_provider.dart';
 import 'widgets/score_report.dart';
 
 /// ExamScreen - Test flow controller
-/// Matches React Native (tabs)/exam.tsx
 class ExamScreen extends ConsumerWidget {
   const ExamScreen({super.key});
 
