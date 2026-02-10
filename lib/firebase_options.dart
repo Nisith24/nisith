@@ -5,6 +5,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
@@ -18,11 +19,11 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAya5qwTO63QH5y5ml7jFVFlAetFLWCS4M',
-    appId: '1:165291680266:android:d0a5bd5cecd21588c9b5f3',
-    messagingSenderId: '165291680266',
-    projectId: 'native-acfca',
-    storageBucket: 'native-acfca.firebasestorage.app',
-  );
+  static FirebaseOptions get android => FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY']!,
+        appId: dotenv.env['FIREBASE_ANDROID_APP_ID']!,
+        messagingSenderId: dotenv.env['FIREBASE_ANDROID_MESSAGING_SENDER_ID']!,
+        projectId: dotenv.env['FIREBASE_ANDROID_PROJECT_ID']!,
+        storageBucket: dotenv.env['FIREBASE_ANDROID_STORAGE_BUCKET']!,
+      );
 }
