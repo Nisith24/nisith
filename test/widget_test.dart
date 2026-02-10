@@ -1,15 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:neetflow_flutter/core/services/background_sync_service.dart';
 import 'package:neetflow_flutter/features/auth/providers/auth_provider.dart';
 import 'package:neetflow_flutter/core/models/user_profile.dart';
 import 'package:neetflow_flutter/main.dart';
-// Fake is exported by flutter_test via test_api
-// Mockito is not strictly needed if we only use Fake, but let's keep it if we need specific mock behavior.
-// However, the error said import is unnecessary.
-// Let's remove mockito import and see.
-// But wait, Fake is in test_api. flutter_test exports test_api.
-// So we don't need mockito for Fake.
+import 'package:neetflow_flutter/core/theme/theme_provider.dart';
 
 // Create a mock for BackgroundSyncService
 class MockBackgroundSyncService extends Fake implements BackgroundSyncService {
@@ -44,6 +40,16 @@ class MockAuthNotifier extends StateNotifier<AsyncValue<AuthState>> implements A
   void updateUserProfileLocally(UserProfile Function(UserProfile?) updater) {}
 }
 
+// Mock ThemeNotifier to avoid Hive access
+class MockThemeNotifier extends StateNotifier<ThemeMode> implements ThemeNotifier {
+  MockThemeNotifier() : super(ThemeMode.light);
+
+  @override
+  void toggleTheme() {}
+
+  // We don't need _loadTheme because we set initial state in super
+}
+
 void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
@@ -52,6 +58,7 @@ void main() {
         overrides: [
           backgroundSyncServiceProvider.overrideWithValue(MockBackgroundSyncService()),
           authStateProvider.overrideWith((ref) => MockAuthNotifier()),
+          themeProvider.overrideWith((ref) => MockThemeNotifier()),
         ],
         child: const NeetFlowApp(),
       ),
