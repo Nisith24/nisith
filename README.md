@@ -1,6 +1,6 @@
 # NeetFlow Flutter
 
-Flutter migration of the React Native MCQ learning app.
+Flutter MCQ learning app.
 
 ## Setup
 
