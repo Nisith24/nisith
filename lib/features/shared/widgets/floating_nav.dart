@@ -85,8 +85,12 @@ class _FloatingNavState extends State<FloatingNav>
 
   @override
   Widget build(BuildContext context) {
+    // Cache theme values to avoid lookups in builder
+    final isDark = context.isDark;
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 16,
+      top: topPadding + 16,
       right: 20,
       child: AnimatedBuilder(
         animation: _controller,
@@ -96,14 +100,14 @@ class _FloatingNavState extends State<FloatingNav>
             width: _widthAnimation.value,
             decoration: BoxDecoration(
               color: _isExpanded
-                  ? (context.isDark
+                  ? (isDark
                       ? AppColors.dark.cardSurface
                       : AppColors.light.cardSurface)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(25),
               border: _isExpanded
                   ? Border.all(
-                      color: context.isDark
+                      color: isDark
                           ? AppColors.dark.border.withValues(alpha: 0.5)
                           : AppColors.light.border.withValues(alpha: 0.5),
                     )
@@ -112,6 +116,8 @@ class _FloatingNavState extends State<FloatingNav>
                 if (_isExpanded)
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.15),
+
+// ... rest of the file
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                     spreadRadius: -2,
@@ -153,10 +159,10 @@ class _FloatingNavState extends State<FloatingNav>
                                 icon: Icon(
                                   item.icon,
                                   color: isSelected
-                                      ? (context.isDark
+                                      ? (isDark
                                           ? AppColors.dark.primary
                                           : AppColors.light.primary)
-                                      : (context.isDark
+                                      : (isDark
                                           ? AppColors.dark.icon
                                           : AppColors.light.icon),
                                   size: 18,
@@ -191,14 +197,14 @@ class _FloatingNavState extends State<FloatingNav>
                         height: 50,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: context.isDark
+                          color: isDark
                               ? AppColors.dark.primary
                               : AppColors.light.primary,
                           shape: BoxShape.circle,
                           boxShadow: [
                             if (!_isExpanded)
                               BoxShadow(
-                                color: (context.isDark
+                                color: (isDark
                                         ? AppColors.dark.primary
                                         : AppColors.light.primary)
                                     .withValues(alpha: 0.3),

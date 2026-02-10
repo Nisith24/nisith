@@ -68,7 +68,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // Main shell with floating nav
       ShellRoute(
         builder: (context, state, child) =>
-            ScaffoldWithFloatingNav(child: child),
+            ScaffoldWithFloatingNav(state: state, child: child),
         routes: [
           GoRoute(
             path: '/',

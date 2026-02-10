@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../../../core/utils/input_validator.dart';
 
 import '../../../core/models/models.dart';
 import '../../../core/storage/local_storage_service.dart';
@@ -75,6 +76,12 @@ class MCQRepository {
 
   /// Get MCQs for a specific subject (Local-First)
   Future<List<MCQ>> getMCQsBySubject(String subject) async {
+    // Sanitize input
+    if (!InputValidator.isValidId(subject)) {
+      debugPrint('[MCQRepository] Invalid subject ID: $subject');
+      return [];
+    }
+
     // Try local first
     final localMcqs = await _localStorage.getMCQsForSubject(subject);
     if (localMcqs.isNotEmpty) {

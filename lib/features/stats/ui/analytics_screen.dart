@@ -14,7 +14,7 @@ class AnalyticsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(userProfileProvider);
     final analytics = profile?.analytics;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Analytics'),
@@ -48,7 +48,7 @@ class AnalyticsScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   Row(
                     children: [
                       Expanded(
@@ -74,9 +74,9 @@ class AnalyticsScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Accuracy bar
                   Row(
                     children: [
@@ -111,9 +111,9 @@ class AnalyticsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Subject-wise breakdown
             Text(
               'Subject-wise Performance',
@@ -124,7 +124,7 @@ class AnalyticsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            
+
             if (analytics?.subjectWise.isEmpty ?? true)
               Container(
                 padding: const EdgeInsets.all(40),
@@ -139,7 +139,7 @@ class AnalyticsScreen extends ConsumerWidget {
               ...analytics!.subjectWise.entries.map((entry) {
                 final subject = entry.key;
                 final stats = entry.value;
-                
+
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),

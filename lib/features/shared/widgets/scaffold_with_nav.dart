@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_colors.dart';
 import 'floating_nav.dart';
 
 /// Scaffold with floating navigation bar
 class ScaffoldWithFloatingNav extends StatefulWidget {
   final Widget child;
+  final GoRouterState state;
 
   const ScaffoldWithFloatingNav({
     super.key,
     required this.child,
+    required this.state,
   });
 
   @override
@@ -18,29 +21,19 @@ class ScaffoldWithFloatingNav extends StatefulWidget {
 }
 
 class _ScaffoldWithFloatingNavState extends State<ScaffoldWithFloatingNav> {
-  int _currentIndex = 0;
-
   static const _routes = ['/', '/learn', '/profile', '/analytics'];
 
   void _onNavTap(int index) {
-    setState(() => _currentIndex = index);
     context.go(_routes[index]);
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Sync current index with route
-    final location = GoRouterState.of(context).uri.toString();
-    final index = _routes.indexOf(location);
-    if (index >= 0 && index != _currentIndex) {
-      _currentIndex = index;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
+    // Use state passed from router instead of inherited widget lookup
+    final location = widget.state.uri.toString();
+    final index = _routes.indexOf(location);
+    final currentIndex = index >= 0 ? index : 0;
+
     final hideNav =
         location.startsWith('/exam') || location.startsWith('/bookmarks');
 
@@ -53,7 +46,8 @@ class _ScaffoldWithFloatingNavState extends State<ScaffoldWithFloatingNav> {
           // Floating nav
           if (!hideNav)
             FloatingNav(
-              currentIndex: _currentIndex,
+              key: ValueKey('nav_${context.isDark}'),
+              currentIndex: currentIndex,
               onTap: _onNavTap,
             ),
         ],

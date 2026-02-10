@@ -97,48 +97,7 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
 
                   // Stats
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Your Activity',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: context.textSecondaryColor,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => context.push('/analytics'),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'View Detailed',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: context.primaryColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(LucideIcons.chevronRight,
-                                    size: 14, color: context.primaryColor),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () => context.push('/analytics'),
-                        child: const _StatsSection(),
-                      ),
-                    ],
-                  ),
+                  const _StatsSection(),
 
                   const SizedBox(height: 24),
 

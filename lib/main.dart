@@ -35,7 +35,11 @@ Future<void> main() async {
     ),
   );
 
-  runApp(const ProviderScope(child: NeetFlowApp()));
+  runApp(
+    const ProviderScope(
+      child: NeetFlowApp(),
+    ),
+  );
 }
 
 class NeetFlowApp extends ConsumerStatefulWidget {

@@ -258,6 +258,10 @@ class ExamNotifier extends StateNotifier<ExamState> {
 
   /// Complete test
   void completeTest() {
+    if (state.testStatus == TestStatus.completed) {
+      return; // Prevent double submission
+    }
+
     _timer?.cancel();
     state = state.copyWith(
       testStatus: TestStatus.completed,

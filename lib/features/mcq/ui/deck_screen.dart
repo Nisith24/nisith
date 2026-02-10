@@ -49,7 +49,7 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _FilterOptionsSheet(),
+      builder: (context) => const _FilterOptionsSheet(),
     );
   }
 
@@ -209,7 +209,18 @@ class _DeckScreenState extends ConsumerState<DeckScreen> {
   }
 }
 
-class _FilterOptionsSheet extends ConsumerWidget {
+class _FilterOptionsSheet extends ConsumerStatefulWidget {
+  const _FilterOptionsSheet();
+
+  @override
+  ConsumerState<_FilterOptionsSheet> createState() =>
+      _FilterOptionsSheetState();
+}
+
+class _FilterOptionsSheetState extends ConsumerState<_FilterOptionsSheet> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
   static const _subjects = [
     'Anatomy',
     'Physiology',
@@ -232,25 +243,57 @@ class _FilterOptionsSheet extends ConsumerWidget {
     'Anesthesia'
   ];
 
+  static final Map<String, IconData> _subjectIcons = {
+    'Anatomy': LucideIcons.bone,
+    'Physiology': LucideIcons.activity,
+    'Biochemistry': LucideIcons.flaskConical,
+    'Pharmacology': LucideIcons.pill,
+    'Pathology': LucideIcons.microscope,
+    'Microbiology': LucideIcons.microscope,
+    'Forensic Medicine': LucideIcons.scale,
+    'SPM': LucideIcons.users,
+    'ENT': LucideIcons.ear,
+    'Ophthalmology': LucideIcons.eye,
+    'Medicine': LucideIcons.stethoscope,
+    'Surgery': LucideIcons.scissors,
+    'OBG': LucideIcons.baby,
+    'Pediatrics': LucideIcons.baby,
+    'Orthopedics': LucideIcons.accessibility,
+    'Psychiatry': LucideIcons.brain,
+    'Dermatology': LucideIcons.sparkles,
+    'Radiology': LucideIcons.scan,
+    'Anesthesia': LucideIcons.syringe,
+  };
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final deckState = ref.watch(deckProvider);
     final selectedSubject = deckState.selectedSubject;
 
+    final filteredSubjects = _subjects
+        .where((s) => s.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
         color: context.isDark
             ? AppColors.dark.background
             : AppColors.light.background,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         children: [
           // Handle
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              margin: const EdgeInsets.only(top: 12),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
@@ -261,125 +304,181 @@ class _FilterOptionsSheet extends ConsumerWidget {
           ),
 
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Deck Settings',
-                  style: Theme.of(context).textTheme.headlineSmall,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Deck Settings',
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                              ),
+                    ),
+                    Text(
+                      'Filter by subject or refresh data',
+                      style: TextStyle(
+                        color: context.textSecondaryColor,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
-                TextButton.icon(
+                IconButton.filledTonal(
                   onPressed: () {
                     ref.read(deckProvider.notifier).refresh();
                     Navigator.pop(context);
                   },
-                  icon: const Icon(LucideIcons.refreshCw, size: 16),
-                  label: const Text('Refresh'),
+                  icon: const Icon(LucideIcons.refreshCw, size: 18),
                 ),
               ],
             ),
           ),
 
-          const Divider(height: 1),
-
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Filter by Subject',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      FilterChip(
-                        label: const Text('All Subjects'),
-                        selected: selectedSubject == null,
-                        onSelected: (_) {
-                          ref
-                              .read(deckProvider.notifier)
-                              .setSubjectFilter(null);
-                          Navigator.pop(context);
-                        },
-                        backgroundColor: context.isDark
-                            ? AppColors.dark.cardSurface
-                            : AppColors.light.cardSurface,
-                        selectedColor:
-                            context.primaryColor.withValues(alpha: 0.2),
-                        // Checkmark color implicitly handled but can force if needed
-                        showCheckmark: false,
-                        labelStyle: TextStyle(
-                          color: selectedSubject == null
-                              ? context.primaryColor
-                              : context.textColor,
-                          fontWeight: selectedSubject == null
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: selectedSubject == null
-                                ? context.primaryColor
-                                : (context.isDark
-                                    ? AppColors.dark.border
-                                    : AppColors.light.border),
-                          ),
-                        ),
-                      ),
-                      ..._subjects.map((subject) {
-                        final isSelected = selectedSubject == subject;
-                        return FilterChip(
-                          label: Text(subject),
-                          selected: isSelected,
-                          onSelected: (_) {
-                            ref
-                                .read(deckProvider.notifier)
-                                .setSubjectFilter(subject);
-                            Navigator.pop(context);
-                          },
-                          backgroundColor: context.isDark
-                              ? AppColors.dark.cardSurface
-                              : AppColors.light.cardSurface,
-                          selectedColor:
-                              context.primaryColor.withValues(alpha: 0.2),
-                          showCheckmark: false,
-                          labelStyle: TextStyle(
-                            color: isSelected
-                                ? context.primaryColor
-                                : context.textColor,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(
-                              color: isSelected
-                                  ? context.primaryColor
-                                  : (context.isDark
-                                      ? AppColors.dark.border
-                                      : AppColors.light.border),
-                            ),
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                ],
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (val) => setState(() => _searchQuery = val),
+              decoration: InputDecoration(
+                hintText: 'Search subjects...',
+                prefixIcon: const Icon(LucideIcons.search, size: 20),
+                filled: true,
+                fillColor: context.isDark
+                    ? AppColors.dark.cardSurface
+                    : AppColors.light.cardSurface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
               ),
             ),
           ),
+
+          const SizedBox(height: 12),
+          const Divider(height: 1, indent: 24, endIndent: 24),
+
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+              children: [
+                // All Subjects Tile
+                _buildSubjectTile(
+                  context: context,
+                  title: 'All Subjects',
+                  icon: LucideIcons.layers,
+                  isSelected: selectedSubject == null,
+                  onTap: () {
+                    ref.read(deckProvider.notifier).setSubjectFilter(null);
+                    Navigator.pop(context);
+                  },
+                  isSpecial: true,
+                ),
+
+                const SizedBox(height: 16),
+                Text(
+                  'ALL SUBJECTS',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    color: context.textSecondaryColor,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                ...filteredSubjects.map((subject) {
+                  final isSelected = selectedSubject == subject;
+                  return _buildSubjectTile(
+                    context: context,
+                    title: subject,
+                    icon: _subjectIcons[subject] ?? LucideIcons.book,
+                    isSelected: isSelected,
+                    onTap: () {
+                      ref.read(deckProvider.notifier).setSubjectFilter(subject);
+                      Navigator.pop(context);
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSubjectTile({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+    bool isSpecial = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: isSelected
+            ? context.primaryColor.withValues(alpha: 0.1)
+            : (context.isDark
+                ? AppColors.dark.cardSurface
+                : AppColors.light.cardSurface),
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? context.primaryColor
+                        : (context.isDark
+                            ? Colors.grey[850]
+                            : Colors.grey[100]),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 20,
+                    color: isSelected ? Colors.white : context.primaryColor,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w600,
+                      color:
+                          isSelected ? context.primaryColor : context.textColor,
+                    ),
+                  ),
+                ),
+                if (isSelected)
+                  Icon(LucideIcons.checkCircle2,
+                      size: 20, color: context.primaryColor)
+                else
+                  Icon(LucideIcons.chevronRight,
+                      size: 18,
+                      color: context.textSecondaryColor.withValues(alpha: 0.5)),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

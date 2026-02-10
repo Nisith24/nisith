@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../providers/exam_provider.dart';
@@ -272,9 +273,22 @@ class _MockTestView extends StatelessWidget {
                   const SizedBox(height: 20),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      currentQuestion.imageUrl!,
+                    child: CachedNetworkImage(
+                      imageUrl: currentQuestion.imageUrl!,
                       fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        height: 200,
+                        color: context.cardSurfaceColor,
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        height: 200,
+                        color: context.errorColor.withValues(alpha: 0.1),
+                        child: Icon(LucideIcons.imageOff,
+                            color: context.errorColor),
+                      ),
                     ),
                   ),
                 ],
