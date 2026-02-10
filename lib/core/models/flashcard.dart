@@ -16,11 +16,11 @@ class Flashcard {
 
   factory Flashcard.fromJson(Map<String, dynamic> json) {
     return Flashcard(
-      id: json['id'] as String,
-      front: json['front'] as String,
-      back: json['back'] as String,
-      subject: json['subject'] as String? ?? 'General',
-      topic: json['topic'] as String?,
+      id: json['id']?.toString() ?? '',
+      front: json['front']?.toString() ?? '',
+      back: json['back']?.toString() ?? '',
+      subject: json['subject']?.toString() ?? 'General',
+      topic: json['topic']?.toString(),
     );
   }
 
